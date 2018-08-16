@@ -23,9 +23,13 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+*{
+  z-index: inherit;
+}
 .tile{
   margin-bottom: 1em;
   transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  padding-bottom: 1em;
 }
 .tile:hover{
   cursor: pointer;

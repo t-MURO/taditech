@@ -33,9 +33,16 @@
     </v-toolbar>
     
     <v-content>
-      <v-container>
-          <router-view></router-view>
-      </v-container>
+      <div class="fullscreen-video-wrap">
+        <video src="./assets/ink.mp4" autoplay="true" loop="true">
+        </video>
+      </div>
+        <div class="video-overlay"></div>
+        <div class="main-content">
+        <v-container>
+            <router-view></router-view>
+        </v-container>
+      </div>
     </v-content>
 </v-app>
 </template>
@@ -59,3 +66,34 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.fullscreen-video-wrap{
+  z-index: 0;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100vh;
+  overflow:hidden;
+  background-color: antiquewhite;
+}
+.fullscreen-video-wrap video{
+  z-index: 1;
+  min-height:100%;
+  min-width:100%;
+}
+.video-overlay{
+  height:100vh;
+  position: fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  z-index:0;
+  background:#111;
+  opacity:0.85;
+}
+.main-content{
+  z-index: 2;
+}
+</style>

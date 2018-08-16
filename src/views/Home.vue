@@ -2,11 +2,11 @@
     <div>
         <div class="custom-grid">
         <h1>August 2018</h1>
-            <album-tile v-for="(album, index) in albums" :key="index" :album="album">
+            <album-tile v-for="(album, index) in albums" :key="Math.random(index)" :album="album">
             </album-tile>
-            <album-tile v-for="(album, index) in albums" :key="index" :album="album">
+            <album-tile v-for="(album, index) in albums" :key="Math.random(index)" :album="album">
             </album-tile>
-            <album-tile v-for="(album, index) in albums" :key="index" :album="album">
+            <album-tile v-for="(album, index) in albums" :key="Math.random(index)" :album="album">
             </album-tile>
         </div>
     </div>
@@ -85,7 +85,9 @@ export default {
 </script>
 
 <style>
-
+*{
+  z-index: inherit;
+}
 .custom-grid{
   display: grid;
   grid-template-columns: repeat(auto-fill, 175px);
