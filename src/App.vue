@@ -34,7 +34,7 @@
     
     <v-content>
       <div class="fullscreen-video-wrap">
-        <video src="./assets/ink.mp4" autoplay="true" loop="true">
+        <video src="./assets/ink.mp4" autoplay="true" loop="true" muted="true">
         </video>
       </div>
         <div class="video-overlay"></div>
