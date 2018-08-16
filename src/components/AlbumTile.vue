@@ -1,20 +1,15 @@
 <template>
-    <!-- <div class="tile">
-      <img :src="albumUrl" alt="">
-    </div> -->
-    <!-- <v-flex xs2> -->
-      <div class="tile">
-        <div class="img-container">
-          <div class="img-container-inner">
-            <img :src="album.img">
-          </div>
-        </div>
-        <div class="album-info">
-          <div class="album-title">{{album.title}}</div>
-          <div class="artist">{{album.artist}}</div>
-        </div>
+  <div class="tile">
+    <div class="img-container">
+      <div>
+        <img :src="album.img">
       </div>
-    <!-- </v-flex> -->
+    </div>
+    <div class="album-info">
+      <div class="album-title">{{album.title}}</div>
+      <div class="artist">{{album.artist}}</div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -30,10 +25,11 @@ export default {
 <style scoped>
 .tile{
   margin-bottom: 1em;
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
 }
 .tile:hover{
   cursor: pointer;
-  box-shadow: 20px;
+  box-shadow: 0 0 30px rgba(255,255,255,0.25), 0 0 30px rgba(255,255,255,0.22);
 }
 
 .img-container{
@@ -61,6 +57,7 @@ img{
 }
 
 .album-info{
+  text-align: center;
   margin-top: .5em;
   display: flex;
   flex-wrap: nowrap;

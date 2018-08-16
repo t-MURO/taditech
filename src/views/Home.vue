@@ -88,8 +88,7 @@ export default {
 
 .custom-grid{
   display: grid;
-  margin: 0 auto;
-  grid-template-columns: repeat(auto-fill, 200px);
+  grid-template-columns: repeat(auto-fill, 175px);
   grid-gap: 1em;
   justify-content: space-around;
 }
