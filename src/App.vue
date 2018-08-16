@@ -8,14 +8,16 @@
       fixed
       app>
       <v-list dense>
+            <router-link to="/about">
         <v-list-tile>
           <v-list-tile-action>
             <v-icon>dashboard</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Dashboard</v-list-tile-title>
+            <v-list-tile-title>About</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+            </router-link>
         <v-list-tile>
           <v-list-tile-action>
             <v-icon>settings</v-icon>
@@ -29,7 +31,9 @@
 
     <v-toolbar app fixed clipped-left>
       <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>Tadi Tech</v-toolbar-title>
+      <v-toolbar-title>
+      <router-link to="/">Tadi Tech</router-link>
+      </v-toolbar-title>
     </v-toolbar>
     
     <v-content>
@@ -68,6 +72,10 @@ export default {
 </script>
 
 <style scoped>
+a{
+  text-decoration: none;
+  color:white;
+}
 .fullscreen-video-wrap{
   z-index: 0;
   position:fixed;
