@@ -1,4 +1,4 @@
-# tadi-tech
+# taditech
 
 ## Project setup
 ```
