@@ -1,17 +1,19 @@
 <template>
-  <v-layout fluid justify-space-around wrap class="align-last-row">
-    <album-tile v-for="(album, index) in albums" :key="index" :album="album">
-    </album-tile>
-    <album-tile v-for="(album, index) in albums" :key="index" :album="album">
-    </album-tile>
-    <album-tile v-for="(album, index) in albums" :key="index" :album="album">
-    </album-tile>
-  </v-layout>
+    <div>
+        <div class="custom-grid">
+        <h1>August 2018</h1>
+            <album-tile v-for="(album, index) in albums" :key="index" :album="album">
+            </album-tile>
+            <album-tile v-for="(album, index) in albums" :key="index" :album="album">
+            </album-tile>
+            <album-tile v-for="(album, index) in albums" :key="index" :album="album">
+            </album-tile>
+        </div>
+    </div>
 </template>
 
 <script>
 import AlbumTile from '../components/AlbumTile';
-// import albums from '../data/albumDummys.js'
 
 export default {
   name: 'Home',
@@ -83,8 +85,29 @@ export default {
 </script>
 
 <style>
-.align-last-row::after{
-  content: "";
-  flex: auto;
-  }
+
+.custom-grid{
+  display: grid;
+  margin: 0 auto;
+  grid-template-columns: repeat(auto-fill, 200px);
+  grid-gap: 1em;
+  justify-content: space-around;
+}
+
+h1{
+    font-weight: 300;
+    grid-column: 1/-1;
+}
+
+
+@media screen and (max-width: 870px) {
+    .custom-grid{
+        grid-template-columns: repeat(auto-fill, 150px);
+    }
+}
+@media screen and (max-width: 370px) {
+    .custom-grid{
+        grid-template-columns: repeat(auto-fill, 120px);
+    }
+}
 </style>
