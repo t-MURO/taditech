@@ -26,6 +26,16 @@
             <v-list-tile-title>Settings</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
+        <a href="http://localhost:60601/login">
+        <v-list-tile>
+          <v-list-tile-action>
+            <v-icon>warning</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>Login</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+        </a>
       </v-list>
     </v-navigation-drawer>
 
@@ -67,6 +77,11 @@ export default {
       right: true,
       title: 'Vuetify.js'
     };
+  },
+  methods:{
+    login(){
+      fetch('http://localhost:60601/login');
+    }
   }
 };
 </script>
@@ -76,6 +91,11 @@ a{
   text-decoration: none;
   color:white;
 }
+
+aside{
+  opacity: .75;
+}
+
 .fullscreen-video-wrap{
   z-index: 0;
   position:fixed;
