@@ -1,13 +1,14 @@
 <template>
-  <div class="tile">
+  <div class="tile" v-if="showTimeframe()">
     <div class="img-container">
       <div>
-        <img :src="album.img">
+        <img :src="album.images[0].url">
       </div>
     </div>
     <div class="album-info">
-      <div class="album-title">{{album.title}}</div>
-      <div class="artist">{{album.artist}}</div>
+      <div class="album-title">{{album.name}}</div>
+      <div class="artist">{{album.artists[0].name}}</div>
+      <div class="release-date">{{album.release_date}}</div>
     </div>
   </div>
 </template>
@@ -17,6 +18,11 @@ export default {
   name: 'AlbumTile',
   props:{
     album:Object,
+  },
+  methods:{
+      showTimeframe(){
+      return new Date(this.album.release_date) > new Date('2017-01-01');
+    }
   }
 };
 </script>
@@ -73,7 +79,13 @@ img{
 .album-title{
   font-weight: 400;
 }
+
 .artist{
   font-weight: 200;
+}
+
+.release-date{
+  font-weight: 200;
+  font-size: .8em;
 }
 </style>

@@ -4,10 +4,6 @@
         <h1>August 2018</h1>
             <album-tile v-for="(album, index) in albums" :key="Math.random(index)" :album="album">
             </album-tile>
-            <album-tile v-for="(album, index) in albums" :key="Math.random(index)" :album="album">
-            </album-tile>
-            <album-tile v-for="(album, index) in albums" :key="Math.random(index)" :album="album">
-            </album-tile>
         </div>
     </div>
 </template>
@@ -22,65 +18,85 @@ export default {
   },
   data(){
     return {
-      albums: [
-    {
-        img: 'https://i.scdn.co/image/65fd944b95c86869b311cd066d1666f34a3bc573',
-        title: 'Save Me',
-        artist: 'Balthazar & JackRock'
-    },
-    {
-        img: 'https://i.scdn.co/image/6b603231783f57bedd403a79ea3c63896548663b',
-        title: 'Biomorph',
-        artist: 'Enrico Sangiuliano'
-    },
-    {
-        img: 'https://i.scdn.co/image/a105be1ef55f88a3013b7f9aff843c75f5cbe7b9',
-        title: 'Offending Public Morality',
-        artist: 'Dax J'
-    },
-    {
-        img: 'https://i.scdn.co/image/ff7cfe963ba76e785e1a2cf98de986d8002d308d',
-        title: 'EXILE 007',
-        artist: 'Johannes Heil'
-    },
-    {
-        img: 'https://i.scdn.co/image/b24620823183cc05ea0c74fb40f18d2e582d8f63',
-        title: 'EXILE 007',
-        artist: 'Johannes Heil'
-    },
-    {
-        img: 'https://i.scdn.co/image/8d04f463c83a267daf4abca2b95a7bbd170d2723',
-        title: 'XY',
-        artist: 'Exilles'
-    },
-    {
-        img: 'https://i.scdn.co/image/3016bf6b2ff86e92bffb57d41d145f86941ed8a9',
-        title: 'Alliance EP',
-        artist: 'Exilles'
-    },
-    {
-        img: 'https://i.scdn.co/image/62191f43fd445efcc623dede3786ba071af057cb',
-        title: 'Waterfall EP',
-        artist: 'Exilles'
-    },
-    {
-        img: 'https://i.scdn.co/image/6b603231783f57bedd403a79ea3c63896548663b',
-        title: 'Biomorph',
-        artist: 'Enrico Sangiuliano'
-    },
-        {
-        img: 'https://i.scdn.co/image/3016bf6b2ff86e92bffb57d41d145f86941ed8a9',
-        title: 'Alliance EP',
-        artist: 'Exilles'
-    },
-    {
-        img: 'https://i.scdn.co/image/ff7cfe963ba76e785e1a2cf98de986d8002d308d',
-        title: 'EXILE 007',
-        artist: 'Johannes Heil'
-    },
-]
+        token: null,
+        artists: [],
+        SPOTIFY_URL: '',
+        albumsSimple: [],
+        albums: [],
+        albumsSorted: [],
     }
   },
+  created(){
+    let url = new URL(window.location.href);
+    let token = url.searchParams.get('access_token');
+    this.token = token;
+    if(token){
+        this.getFollowedArtists(token);
+    }
+      
+
+  },
+  methods:{
+    getFollowedArtists(token){
+        fetch('https://api.spotify.com/v1/me/following?type=artist', {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            this.artists = data;
+            this.artists.artists.items.forEach(artist => this.getArtistsAlbums(artist.href, token))
+        })
+        .catch(err => console.log(err))
+    },
+    getArtistsAlbums(artistURI, token){
+        fetch(`${artistURI}/albums`, {
+            headers: {
+                Authorization: 'Bearer ' + token
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            data.items.forEach(album => this.albumsSimple.push(album));
+        })
+    },
+    getAlbums(queryParams){
+        fetch(`https://api.spotify.com/v1/albums${queryParams}`, {
+            headers: {
+                Authorization: `Bearer ${this.token}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.albums) this.albums.push(...data.albums)
+        })
+        .catch(err => console.log(err))
+    },
+
+  },
+  watch: {
+      albumsSimple: function(album) {
+
+          if (this.albumsSimple.length >= 20){
+              let temp = new Array(...this.albumsSimple.splice(0, 20));
+              this.albumsSimple.splice(0, 20);
+              let queryParams = '?ids='
+              temp.forEach((album, index) => {
+                  if (index > 19) return;
+                  queryParams = queryParams + album.id + ','
+                  });
+              queryParams = queryParams.slice(0, -1);
+              this.getAlbums(queryParams);
+          }
+      },
+      albums: function(){
+          let temp = new Array(...this.albums);
+          temp.sort((a,b)=> new Date(b.release_date) - new Date(a.release_date));
+          this.albumsSorted = temp;
+      },
+
+  }
 };
 </script>
 
