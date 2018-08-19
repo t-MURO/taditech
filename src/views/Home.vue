@@ -2,8 +2,9 @@
     <div>
         <div class="custom-grid">
         <h1>August 2018</h1>
-            <album-tile v-for="(album, index) in albums" :key="Math.random(index)" :album="album">
-            </album-tile>
+        <!-- <v-btn color="info" @click="debugging()">Debug</v-btn> -->
+        <album-tile v-for="(album, index) in albumsSorted" :key="Math.random(index)" :album="album">
+        </album-tile>
         </div>
     </div>
 </template>
@@ -31,34 +32,38 @@ export default {
     let token = url.searchParams.get('access_token');
     this.token = token;
     if(token){
-        this.getFollowedArtists(token);
+        this.getFollowedArtists();
     }
       
 
   },
   methods:{
-    getFollowedArtists(token){
-        fetch('https://api.spotify.com/v1/me/following?type=artist', {
+    getFollowedArtists(url){
+        if(!url) url = 'https://api.spotify.com/v1/me/following?type=artist&limit=50';
+        fetch(url, {
             headers: {
-                Authorization: 'Bearer ' + token
+                Authorization: 'Bearer ' + this.token
             }
         })
         .then(res => res.json())
         .then(data => {
-            this.artists = data;
-            this.artists.artists.items.forEach(artist => this.getArtistsAlbums(artist.href, token))
+            this.artists.push(...data.artists.items);
+            this.artists.forEach(artist => this.getArtistsAlbums(artist.href))
+            if(data.artists.next){
+                this.getFollowedArtists(data.artists.next);
+            }
         })
         .catch(err => console.log(err))
     },
-    getArtistsAlbums(artistURI, token){
-        fetch(`${artistURI}/albums`, {
+    getArtistsAlbums(artistURI){
+        fetch(`${artistURI}/albums?limit=20`, {
             headers: {
-                Authorization: 'Bearer ' + token
+                Authorization: 'Bearer ' + this.token
             }
         })
         .then(res => res.json())
         .then(data => {
-            data.items.forEach(album => this.albumsSimple.push(album));
+            this.albumsSimple.push(...data.items);
         })
     },
     getAlbums(queryParams){
@@ -73,26 +78,44 @@ export default {
         })
         .catch(err => console.log(err))
     },
-
+    uniqueAlbum(album){
+        return this.albums.length === 0 || !this.albums.findIndex(existingAlbum => existingAlbum.id === album.id);
+    },
+    debugging(){
+        console.log(`albumsSimple: ${this.albumsSimple.length}`);
+        console.log(`albums: ${this.albums.length}`);
+        console.log(`albumsSorted: ${this.albumsSorted.length}`);
+    }
   },
   watch: {
       albumsSimple: function(album) {
-
-          if (this.albumsSimple.length >= 20){
-              let temp = new Array(...this.albumsSimple.splice(0, 20));
-              this.albumsSimple.splice(0, 20);
-              let queryParams = '?ids='
-              temp.forEach((album, index) => {
-                  if (index > 19) return;
-                  queryParams = queryParams + album.id + ','
-                  });
-              queryParams = queryParams.slice(0, -1);
-              this.getAlbums(queryParams);
+        if (this.albumsSimple.length >= 20){
+            let temp = new Array(...this.albumsSimple);
+            this.albumsSimple.splice(0, 20);
+            let queryParams = '?ids='
+            temp.forEach((album, index) => {
+                if (this.uniqueAlbum(album) && index > 19) return;
+                queryParams = queryParams + album.id + ','
+                });
+            queryParams = queryParams.slice(0, -1);
+            this.getAlbums(queryParams);
+        } else if(this.albumsSimple.length > 0) {
+            let temp = new Array(...this.albumsSimple);
+            this.albumsSimple = [];
+            let queryParams = '?ids='
+            temp.forEach((album, index) => {
+                if(this.uniqueAlbum(album)) queryParams = queryParams + album.id + ','
+            });
+            queryParams = queryParams.slice(0, -1);
+            this.getAlbums(queryParams);
           }
       },
       albums: function(){
           let temp = new Array(...this.albums);
           temp.sort((a,b)=> new Date(b.release_date) - new Date(a.release_date));
+          temp.forEach(album => {
+              if (!this.albumsSorted.includes(album)) this.albumsSorted.push(album)
+          })
           this.albumsSorted = temp;
       },
 
