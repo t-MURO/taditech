@@ -1,10 +1,11 @@
 <template>
     <div>
         <div class="custom-grid">
-        <h1>August 2018</h1>
-        <!-- <v-btn color="info" @click="debugging()">Debug</v-btn> -->
-        <album-tile v-for="(album, index) in albumsSorted" :key="Math.random(index)" :album="album">
-        </album-tile>
+            <v-btn color="info" @click="albumsToDisplay()">Test</v-btn>
+            <v-btn color="info" @click="debugging()">Debug</v-btn>
+            <h1>August 2018</h1>
+            <album-tile v-for="(album, index) in albumsSorted" :key="Math.random(index)" :album="album">
+            </album-tile>
         </div>
     </div>
 </template>
@@ -25,6 +26,7 @@ export default {
         albumsSimple: [],
         albums: [],
         albumsSorted: [],
+        albumCounter: 0
     }
   },
   created(){
@@ -47,6 +49,7 @@ export default {
         })
         .then(res => res.json())
         .then(data => {
+            console.log(`itearation has ${data.artists.items.length} artists`);
             this.artists.push(...data.artists.items);
             this.artists.forEach(artist => this.getArtistsAlbums(artist.href))
             if(data.artists.next){
@@ -56,13 +59,14 @@ export default {
         .catch(err => console.log(err))
     },
     getArtistsAlbums(artistURI){
-        fetch(`${artistURI}/albums?limit=20`, {
+        fetch(`${artistURI}/albums?limit=20&include_groups=album,single`, {
             headers: {
                 Authorization: 'Bearer ' + this.token
             }
         })
         .then(res => res.json())
         .then(data => {
+            this.albumCounter += data.items.length;
             this.albumsSimple.push(...data.items);
         })
     },
@@ -81,10 +85,25 @@ export default {
     uniqueAlbum(album){
         return this.albums.length === 0 || !this.albums.findIndex(existingAlbum => existingAlbum.id === album.id);
     },
+    albumsToDisplay(){
+        let albums = [];
+        const date = new Date('2018-07-01');
+        this.albumsSorted.some(sortedAlbum =>{
+            if(new Date(sortedAlbum.release_date) > date){
+                // console.log('kommt in die bedingung');
+                albums.push(sortedAlbum);
+            } else return true;
+        });
+        console.log(albums.length);
+        
+        return albums;
+        // console.log(albums.length);
+    },
     debugging(){
         console.log(`albumsSimple: ${this.albumsSimple.length}`);
         console.log(`albums: ${this.albums.length}`);
         console.log(`albumsSorted: ${this.albumsSorted.length}`);
+        console.log(`albumCounter: ${this.albumCounter}`);
     }
   },
   watch: {

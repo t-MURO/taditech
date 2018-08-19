@@ -21,10 +21,12 @@ export default {
   },
   methods:{
     showTimeframe(){
-      return new Date(this.album.release_date) > new Date('2018-06-01');
+      return true;
+      return new Date(this.album.release_date) > new Date('2018-07-01');
     },
     debugging(){
       this.album.artists.forEach((artist,index) => console.log(`Artist: ${this.album.artists[index].name} ID: ${this.album.artists[0].id} URL: ${this.album.artists[0].href}`));
+      console.log(`Album: ${this.album.name} ID: ${this.album.id}`);
     }
   },
 };
