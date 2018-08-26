@@ -26,7 +26,7 @@
             <v-list-tile-title>Settings</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <a href="http://localhost:60601/login">
+        <a href="https://taditech-backend.herokuapp.com/login">
         <v-list-tile>
           <v-list-tile-action>
             <v-icon>warning</v-icon>
@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import Home from './views/Home';
+import Home from './views/Home'
 
 export default {
   name: 'App',
@@ -76,13 +76,8 @@ export default {
       fixed: false,
       right: true,
       title: 'Vuetify.js'
-    };
-  },
-  methods:{
-    login(){
-      fetch('http://localhost:60601/login');
     }
-  }
+  },
 };
 </script>
 

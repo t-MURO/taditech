@@ -1,5 +1,5 @@
 <template>
-  <div class="tile" v-if="showTimeframe()" @click="debugging()">
+  <div class="tile" @click="debugging()">
     <div class="img-container">
       <div>
         <img :src="album.images[0].url">
@@ -20,13 +20,9 @@ export default {
     album:Object,
   },
   methods:{
-    showTimeframe(){
-      return true;
-      return new Date(this.album.release_date) > new Date('2018-07-01');
-    },
     debugging(){
-      this.album.artists.forEach((artist,index) => console.log(`Artist: ${this.album.artists[index].name} ID: ${this.album.artists[0].id} URL: ${this.album.artists[0].href}`));
-      console.log(`Album: ${this.album.name} ID: ${this.album.id}`);
+      this.album.artists.forEach((artist,index) => console.log(`Artist: ${this.album.artists[index].name} ID: ${this.album.artists[0].id} URL: ${this.album.artists[0].href}`))
+      console.log(`Album: ${this.album.name} ID: ${this.album.id}`)
     }
   },
 };
