@@ -30,7 +30,7 @@ export default {
     }
   },
   created(){
-    let url = new URL(window.location.href)
+    const url = new URL(window.location.href)
     this.token = url.searchParams.get('access_token')
         console.log('hi2')
 
@@ -131,6 +131,7 @@ export default {
   },
   watch: {
     completes: function(){
+        if(this.completes < this.simples) return []
         let temp = []
         this.completes.forEach(album => {
             if(album.release_date > this.timeframeStart
