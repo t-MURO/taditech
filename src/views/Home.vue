@@ -1,9 +1,6 @@
 <template>
     <div>
         <div class="custom-grid">
-            <!-- <v-btn color="info" @click="getFullAlbumData()">Test</v-btn> -->
-            <!-- <v-btn color="info" @click="debugging()">Debug</v-btn> -->
-            <!-- <input v-model="artistLink"><v-btn @click="getArtistDebug">Show artist</v-btn> -->
             <h1>August 2018</h1>
             <album-tile v-for="(album, index) in albumsSorted" :key="Math.random(index)" :album="album">
             </album-tile>
@@ -136,10 +133,12 @@ export default {
     completes: function(){
         let temp = []
         this.completes.forEach(album => {
-            if(album.release_date > this.timeframeStart) temp.push(album)
+            if(album.release_date > this.timeframeStart
+                && temp.findIndex(existingAlbum => existingAlbum.id === album.id) === -1) temp.push(album)
         })
         temp.sort((a,b)=> b.release_date > a.release_date)
         this.albumsSorted = temp
+        console.log(this.albumsSorted.length)
     },
     artistsCounterSingle: function() {
       if (this.artistsCounterSingle === this.artists.length && this.artistsCounterAlbum === this.artists.length){
