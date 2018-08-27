@@ -9,14 +9,24 @@
       app>
       <v-list dense>
             <router-link to="/about">
-        <v-list-tile>
-          <v-list-tile-action>
-            <v-icon>dashboard</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>About</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-action>
+                  <v-icon>dashboard</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  <v-list-tile-title>About</v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </router-link>
+            <router-link to="/playlists">
+              <v-list-tile>
+                <v-list-tile-action>
+                  <v-icon>library_music</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  <v-list-tile-title>Playlists</v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
             </router-link>
         <v-list-tile>
           <v-list-tile-action>
@@ -62,12 +72,14 @@
 </template>
 
 <script>
-import Home from './views/Home'
+// import Home from './views/Home'
+import Playlists from './views/Playlists'
 
 export default {
   name: 'App',
   components:{
-    Home
+    // Home,
+    Playlists
   },
   data () {
     return {

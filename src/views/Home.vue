@@ -32,11 +32,10 @@ export default {
   created(){
     const url = new URL(window.location.href)
     this.token = url.searchParams.get('access_token')
-        console.log('hi2')
+        console.log('home component loaded')
 
     if(this.token){
-        console.log('hi')
-        // this.getFollowedArtists()
+        this.getFollowedArtists()
     }
       
 

@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import About from './views/About.vue';
+import Playlists from './views/Playlists.vue'
 
 Vue.use(Router);
 
@@ -23,5 +24,10 @@ export default new Router({
       // component: () => import(/* webpackChunkName: "about" */ './views/About.vue'),
       component: About, 
     },
+    {
+      path: '/playlists',
+      name: 'playlists',
+      component: Playlists
+    }
   ],
 });
