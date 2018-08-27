@@ -36,7 +36,7 @@ export default {
 
     if(this.token){
         console.log('hi')
-        this.getFollowedArtists()
+        // this.getFollowedArtists()
     }
       
 
