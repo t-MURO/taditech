@@ -31,7 +31,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 *{
-  z-index: inherit;
+  /* z-index: inherit; */
 }
 .tile{
   margin-bottom: 1em;

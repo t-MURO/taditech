@@ -1,8 +1,7 @@
 <template>
-    <div>
+<div>
     <h1>Playlists</h1>
-    fdsafsdfsdafsdfsd
-    </div>    
+</div>    
 </template>
 
 <script>
@@ -12,12 +11,14 @@ export default {
     name: 'Playlists',
     data(){
         return {
-            playlists: []
+            playlists: [],
+            token: null
         }
     },
     created(){
         console.log('hi')
-        // if(token) getPlaylsits()
+        this.token = this.$ls.get('token')
+        if(this.token) console.log(this.token)//getPlaylsits()
     },
     methods:{
         getPlaylsits(href){
@@ -35,7 +36,11 @@ export default {
 </script>
 
 <style scoped>
+*{
+  z-index: inherit;
+}
+
 h1{
-    z-index: 33;
+color: white;
 }
 </style>

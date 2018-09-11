@@ -1,11 +1,11 @@
 <template>
-    <div>
-        <div class="custom-grid">
-            <h1>August 2018</h1>
-            <album-tile v-for="(album, index) in albumsSorted" :key="Math.random(index)" :album="album">
-            </album-tile>
-        </div>
-    </div>
+<div>
+  <div class="custom-grid">
+    <h1>August 2018</h1>
+      <album-tile v-for="(album, index) in albumsSorted" :key="Math.random(index)" :album="album">
+      </album-tile>
+  </div>
+</div>
 </template>
 
 <script>
@@ -35,7 +35,8 @@ export default {
         console.log('home component loaded')
 
     if(this.token){
-        this.getFollowedArtists()
+      this.$ls.set('token', this.token)
+        // this.getFollowedArtists()
     }
       
 
@@ -159,7 +160,7 @@ export default {
 
 <style>
 *{
-  z-index: inherit;
+  /* z-index: inherit; */
 }
 .custom-grid{
   display: grid;
