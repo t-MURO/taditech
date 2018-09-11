@@ -56,7 +56,12 @@ export default {
           if(res.data.artists.next) this.getFollowedArtists(res.data.artists.next)
           else this.getArtistsReleases()
         })
-        .catch(err => console.log(err.response))
+        .catch(err => {
+          if(err.response.status === 429){
+            setTimeout(() => this.getFollowedArtists(url),
+            parseInt(err.response.headers['retry-after']) * 1010)
+          }
+        })
     },
 
     getArtistsReleases(){
@@ -88,8 +93,10 @@ export default {
           }
         })
         .catch(err =>{
-          setTimeout(() => this.fetchArtistsReleases(artistId, group, limit),
-          parseInt(err.response.headers['retry-after']) * 1010)
+          if(err.response.status === 429){
+            setTimeout(() => this.fetchArtistsReleases(artistId, group, limit),
+            parseInt(err.response.headers['retry-after']) * 1010)
+          }
         })
     },
 
@@ -117,8 +124,10 @@ export default {
           console.log(`${this.completes.length} out of ${this.simples.length} albums loaded | artistsCounter: ${this.artistsCounterAlbum}`)
         })
         .catch(err =>{
-          setTimeout(() => this.fetchFullAlbums(idsBatchString),
-          parseInt(err.response.headers['retry-after']) * 1010)
+          if(err.response.status === 429){
+            setTimeout(() => this.fetchFullAlbums(idsBatchString),
+            parseInt(err.response.headers['retry-after']) * 1010)
+          }
         })
     },
 
