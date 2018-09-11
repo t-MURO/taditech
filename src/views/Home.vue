@@ -1,11 +1,11 @@
 <template>
-    <div>
-        <div class="custom-grid">
-            <h1>August 2018</h1>
-            <album-tile v-for="(album, index) in albumsSorted" :key="Math.random(index)" :album="album">
-            </album-tile>
-        </div>
-    </div>
+<div>
+  <div class="custom-grid">
+    <h1>August 2018</h1>
+      <album-tile v-for="(album, index) in albumsSorted" :key="Math.random(index)" :album="album">
+      </album-tile>
+  </div>
+</div>
 </template>
 
 <script>
@@ -32,10 +32,10 @@ export default {
   created(){
     const url = new URL(window.location.href)
     this.token = url.searchParams.get('access_token')
-        console.log('hi2')
+        console.log('home component loaded')
 
     if(this.token){
-        console.log('hi')
+      this.$ls.set('token', this.token)
         this.getFollowedArtists()
     }
       
@@ -56,57 +56,81 @@ export default {
           if(res.data.artists.next) this.getFollowedArtists(res.data.artists.next)
           else this.getArtistsReleases()
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+          if(err.response.status === 429){
+            setTimeout(() => this.getFollowedArtists(url),
+            parseInt(err.response.headers['retry-after']) * 1010)
+          }
+        })
     },
+
     getArtistsReleases(){
       this.simples = []
       this.artistsCounterAlbum = 0
       this.artistsCounterSingle = 0
       console.log(this.artists.length)
       this.artists.forEach((artist, index) => {
-        axios.get(`https://api.spotify.com/v1/artists/${artist.id}/albums?limit=3&include_groups=album`, this.reqHeader())
-          .then(res =>{
-            this.simples.push(...res.data.items)
-            this.artistsCounterAlbum++
-            console.log(`${index+1}/${this.artists.length} artists | ${this.simples.length} album count | artistsCounterAlbum: ${this.artistsCounterAlbum}`)
-          })
-          .catch(err => console.log(err))
-
-        axios.get(`https://api.spotify.com/v1/artists/${artist.id}/albums?limit=3&include_groups=single`, this.reqHeader())
-          .then(res =>{
-            this.simples.push(...res.data.items)
-            this.artistsCounterSingle++
-            console.log(`${index+1}/${this.artists.length} artists | ${this.simples.length} album count | artistsCounterSingle: ${this.artistsCounterSingle}`)
-          })
-          .catch(err => console.log(err))
+        this.fetchArtistsReleases(artist.id, 'album')
+        this.fetchArtistsReleases(artist.id, 'single')
       })
     },
+
+    fetchArtistsReleases(artistId, group, customLimit){
+      if(group !== 'album' && group !== 'single'){
+        console.log(`invalid group: ${group}`)
+      }
+      const limit = customLimit || 3;
+      axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums?limit=${limit}&include_groups=${group}`, this.reqHeader())
+        .then(res =>{
+          this.simples.push(...res.data.items)
+
+          if(group === 'album'){
+            this.artistsCounterAlbum++
+            console.log(`${this.artists.length} artists | ${this.simples.length} album count | artistsCounterAlbum: ${this.artistsCounterAlbum}`)
+          } else if(group === 'single'){
+            this.artistsCounterSingle++
+            console.log(`${this.artists.length} artists | ${this.simples.length} album count | artistsCounterSingle: ${this.artistsCounterSingle}`)
+          }
+        })
+        .catch(err =>{
+          if(err.response.status === 429){
+            setTimeout(() => this.fetchArtistsReleases(artistId, group, limit),
+            parseInt(err.response.headers['retry-after']) * 1010)
+          }
+        })
+    },
+
     getFullAlbums(){
       let batch = []
       console.log(`rest is ${this.simples.length % 20}`)
       this.simples.forEach(simple => {
         if(batch.length >= 20){
           if(batch.length > 20 ) console.log('we have a problem')
-          axios.get(`https://api.spotify.com/v1/albums?ids=${batch.toString()}`, this.reqHeader())
-            .then(res => {
-              this.completes.push(...res.data.albums)
-              console.log(`${this.completes.length} out of ${this.simples.length} albums loaded | artistsCounter: ${this.artistsCounterAlbum}`)
-            })
-            .catch(err => console.log(err))
+            this.fetchFullAlbums(batch.toString())
             batch = []
         } 
         batch.push(simple.id)
         
       })
       if(batch.length > 0) {
-        axios.get(`https://api.spotify.com/v1/albums?ids=${batch.toString()}`, this.reqHeader())
-          .then(res => {
-            this.completes.push(...res.data.albums)
-            console.log(`${this.completes.length} out of ${this.simples.length} albums loaded`)
-          })
-          .catch(err => console.log(err))
+        this.fetchFullAlbums(batch.toString())
       }
     },
+
+    fetchFullAlbums(idsBatchString){
+      axios.get(`https://api.spotify.com/v1/albums?ids=${idsBatchString}`, this.reqHeader())
+        .then(res => {
+          this.completes.push(...res.data.albums)
+          console.log(`${this.completes.length} out of ${this.simples.length} albums loaded | artistsCounter: ${this.artistsCounterAlbum}`)
+        })
+        .catch(err =>{
+          if(err.response.status === 429){
+            setTimeout(() => this.fetchFullAlbums(idsBatchString),
+            parseInt(err.response.headers['retry-after']) * 1010)
+          }
+        })
+    },
+
     reqHeader(){
       return {
         headers: {
@@ -115,14 +139,14 @@ export default {
       }
     },
     uniqueAlbum(album){
-        return this.albums.length === 0 || !this.albums.findIndex(existingAlbum => existingAlbum.id === album.id)
+      return this.albums.length === 0 || !this.albums.findIndex(existingAlbum => existingAlbum.id === album.id)
     },
     albumsToDisplay(){
-        let albums = []
+      let albums = []
         const date = new Date('2018-07-01')
         this.albumsSorted.some(sortedAlbum =>{
-            if(new Date(sortedAlbum.release_date) > date){
-                albums.push(sortedAlbum)
+          if(new Date(sortedAlbum.release_date) > date){
+            albums.push(sortedAlbum)
             } else return true
         })
         console.log(albums.length)
@@ -159,9 +183,6 @@ export default {
 </script>
 
 <style>
-*{
-  z-index: inherit;
-}
 .custom-grid{
   display: grid;
   grid-template-columns: repeat(auto-fill, 175px);

@@ -4,6 +4,12 @@ import './plugins/vuetify'
 import App from './App.vue';
 import router from './router';
 import store from './store';
+import localStorage from 'vue-localstorage';
+
+Vue.use(localStorage, {
+  name: 'ls',
+  bind: true
+})
 
 Vue.config.productionTip = false;
 

@@ -1,14 +1,14 @@
 <template>
-  <v-app id="inspire" dark>
+<v-app id="inspire" dark>
 
-    <v-navigation-drawer
-      disable-resize-watcher
-      v-model="drawer"
-      clipped
-      fixed
-      app>
-      <v-list dense>
-            <router-link to="/about">
+  <v-navigation-drawer
+    disable-resize-watcher
+    v-model="drawer"
+    clipped
+    fixed
+    app>
+    <v-list dense>
+      <router-link to="/about">
         <v-list-tile>
           <v-list-tile-action>
             <v-icon>dashboard</v-icon>
@@ -17,16 +17,26 @@
             <v-list-tile-title>About</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-            </router-link>
+      </router-link>
+      <router-link to="/playlists">
         <v-list-tile>
           <v-list-tile-action>
-            <v-icon>settings</v-icon>
+            <v-icon>library_music</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Settings</v-list-tile-title>
+            <v-list-tile-title>Playlists</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <a href="https://taditech-backend.herokuapp.com/login">
+      </router-link>
+      <v-list-tile>
+        <v-list-tile-action>
+          <v-icon>settings</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          <v-list-tile-title>Settings</v-list-tile-title>
+        </v-list-tile-content>
+      </v-list-tile>
+      <a href="https://taditech-backend.herokuapp.com/login">
         <v-list-tile>
           <v-list-tile-action>
             <v-icon>warning</v-icon>
@@ -35,39 +45,39 @@
             <v-list-tile-title>Login</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        </a>
-      </v-list>
-    </v-navigation-drawer>
+      </a>
+    </v-list>
+  </v-navigation-drawer>
 
-    <v-toolbar app fixed clipped-left>
-      <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>
-      <router-link to="/">Tadi Tech</router-link>
-      </v-toolbar-title>
-    </v-toolbar>
-    
-    <v-content>
-      <div class="fullscreen-video-wrap">
-        <video src="./assets/ink.mp4" autoplay="true" loop="true" muted="true">
-        </video>
-      </div>
-        <div class="video-overlay"></div>
-        <div class="main-content">
-        <v-container>
-            <router-view></router-view>
-        </v-container>
-      </div>
-    </v-content>
+  <v-toolbar app fixed clipped-left>
+    <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+    <v-toolbar-title>
+    <router-link to="/">Tadi Tech</router-link>
+    </v-toolbar-title>
+  </v-toolbar>
+  
+  <v-content>
+    <!-- <div class="fullscreen-video-wrap">
+      <video src="./assets/ink.mp4" autoplay="true" loop="true" muted="true">
+      </video>
+    </div>
+      <div class="video-overlay"></div> -->
+      <v-container>
+          <router-view></router-view>
+      </v-container>
+  </v-content>
 </v-app>
 </template>
 
 <script>
 import Home from './views/Home'
+import Playlists from './views/Playlists'
 
 export default {
   name: 'App',
   components:{
-    Home
+    Home,
+    Playlists
   },
   data () {
     return {
@@ -92,7 +102,7 @@ aside{
 }
 
 .fullscreen-video-wrap{
-  z-index: 0;
+  /* z-index: 0; */
   position:fixed;
   top:0;
   left:0;
@@ -102,7 +112,7 @@ aside{
   background-color: antiquewhite;
 }
 .fullscreen-video-wrap video{
-  z-index: 1;
+  /* z-index: 0; */
   min-height:100%;
   min-width:100%;
 }
@@ -112,11 +122,9 @@ aside{
   top:0;
   left:0;
   width:100vw;
-  z-index:0;
+  z-index:1;
   background:#111;
+  /* background: #1DB954; */
   opacity:0.85;
-}
-.main-content{
-  z-index: 2;
 }
 </style>
