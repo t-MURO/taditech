@@ -1,5 +1,5 @@
 <template>
-  <div class="tile" @click="debugging()">
+  <a :href="'spotify:album:'+album.id" class="tile" @click="debugging()">
     <div class="img-container">
       <div>
         <img :src="album.images[0].url">
@@ -10,7 +10,7 @@
       <div class="artist">{{album.artists[0].name}}</div>
       <div class="release-date">{{album.release_date}}</div>
     </div>
-  </div>
+  </a>
 </template>
 
 <script>
@@ -34,12 +34,14 @@ export default {
   /* z-index: inherit; */
 }
 .tile{
+  color: white;
+  text-decoration: none;
   margin-bottom: 1em;
   transition: all 0.3s cubic-bezier(.25,.8,.25,1);
   padding-bottom: 1em;
 }
 .tile:hover{
-  cursor: pointer;
+  /* cursor: pointer; */
   box-shadow: 0 0 30px rgba(255,255,255,0.25), 0 0 30px rgba(255,255,255,0.22);
 }
 
