@@ -1,21 +1,22 @@
 <template>
 <div>
-  <div class="custom-grid">
-    <h1>August 2018</h1>
-      <album-tile v-for="(album, index) in albumsSorted" :key="Math.random(index)" :album="album">
-      </album-tile>
-  </div>
+    <div v-if="loading">
+      <h2>Loading data from Spotify <span v-if="limitHit"> API limit hit, loading can take longer</span></h2>
+      <v-progress-linear :indeterminate="loading"></v-progress-linear>
+    </div>
+      <album-tiles-container :albums="albumsSorted">
+      </album-tiles-container>
 </div>
 </template>
 
 <script>
-import AlbumTile from '../components/AlbumTile'
+import AlbumTilesContainer from '../components/AlbumTilesContainer'
 import axios from 'axios'
 
 export default {
   name: 'Home',
   components:{
-    AlbumTile
+    AlbumTilesContainer
   },
   data(){
     return {
@@ -26,7 +27,9 @@ export default {
         simples:[],
         completes:[],
         albumsSorted: [],
-        timeframeStart: '2018-06'
+        timeframeStart: '2018-08',
+        loading: false,
+        limitHit: false
     }
   },
   created(){
@@ -43,6 +46,7 @@ export default {
   },
   methods:{
     getFollowedArtists(href){
+      this.loading = true
       const limit = 50
       const type = 'artist'
       const params = `?type=${type}&limit=${limit}`
@@ -60,6 +64,9 @@ export default {
           if(err.response.status === 429){
             setTimeout(() => this.getFollowedArtists(url),
             parseInt(err.response.headers['retry-after']) * 1010)
+          } else if(err.response.status === 401){
+            this.limitHit = true
+            window.location.replace('https://taditech-backend.herokuapp.com/login')
           }
         })
     },
@@ -94,6 +101,7 @@ export default {
         })
         .catch(err =>{
           if(err.response.status === 429){
+            this.limitHit = true
             setTimeout(() => this.fetchArtistsReleases(artistId, group, limit),
             parseInt(err.response.headers['retry-after']) * 1010)
           }
@@ -125,6 +133,7 @@ export default {
         })
         .catch(err =>{
           if(err.response.status === 429){
+            this.limitHit = true
             setTimeout(() => this.fetchFullAlbums(idsBatchString),
             parseInt(err.response.headers['retry-after']) * 1010)
           }
@@ -143,23 +152,24 @@ export default {
     },
     albumsToDisplay(){
       let albums = []
-        const date = new Date('2018-07-01')
-        this.albumsSorted.some(sortedAlbum =>{
-          if(new Date(sortedAlbum.release_date) > date){
-            albums.push(sortedAlbum)
-            } else return true
-        })
-        console.log(albums.length)
-        return albums
+      this.albumsSorted.some(sortedAlbum =>{
+        if(sortedAlbum.release_date > this.timeframeStart){
+          albums.push(sortedAlbum)
+        } else return true
+      })
+      console.log(albums.length)
+      return albums
     },
   },
   watch: {
     completes: function(){
         if(this.completes < this.simples) return []
+        this.limitHit = false
+        this.loading = false
         let temp = []
         this.completes.forEach(album => {
-            if(album.release_date > this.timeframeStart
-                && temp.findIndex(existingAlbum => existingAlbum.id === album.id) === -1) temp.push(album)
+          if(album.release_date > this.timeframeStart
+              && temp.findIndex(existingAlbum => existingAlbum.id === album.id) === -1) temp.push(album)
         })
         temp.sort((a,b)=> b.release_date > a.release_date)
         this.albumsSorted = temp

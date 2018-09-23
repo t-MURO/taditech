@@ -9,6 +9,7 @@ import {
   VIcon,
   VGrid,
   VToolbar,
+  VProgressLinear,
   transitions
 } from 'vuetify'
 import 'vuetify/src/stylus/app.styl'
@@ -23,6 +24,7 @@ Vue.use(Vuetify, {
     VIcon,
     VGrid,
     VToolbar,
+    VProgressLinear,
     transitions
   },
   theme: {
