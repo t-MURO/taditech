@@ -8,7 +8,7 @@
     <div class="album-info">
       <div class="album-title">{{album.name}}</div>
       <div class="artist">{{album.artists[0].name}}</div>
-      <div class="release-date">{{album.release_date}}</div>
+      <div class="release-date">{{album.release_date | formatDate}}</div>
     </div>
   </a>
 </template>
@@ -25,6 +25,28 @@ export default {
       console.log(`Album: ${this.album.name} ID: ${this.album.id}`)
     }
   },
+  filters: {
+    formatDate(dateString){
+        const date = new Date(dateString)
+        const day = date.getDate();
+        const year = date.getFullYear()
+        switch(date.getMonth()){
+            case 0: return `${day} January ${year}`
+            case 1: return `${day} February ${year}`
+            case 2: return `${day} March ${year}`
+            case 3: return `${day} April ${year}`
+            case 4: return `${day} May ${year}`
+            case 5: return `${day} June ${year}`
+            case 6: return `${day} July ${year}`
+            case 7: return `${day} August ${year}`
+            case 8: return `${day} September ${year}`
+            case 9: return `${day} October ${year}`
+            case 10: return `${day} November ${year}`
+            case 11: return `${day} December ${year}`
+        }
+
+    }
+  }
 };
 </script>
 
