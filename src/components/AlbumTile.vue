@@ -96,7 +96,7 @@ img{
   margin-top: .5em;
   display: flex;
   flex-wrap: nowrap;
-  flex-flow: row;
+  /* flex-flow: row; */
   flex-direction: column;
   justify-content: flex-end;
 }
