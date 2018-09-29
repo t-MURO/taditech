@@ -1,7 +1,7 @@
 <template>
     <div>
-        <img :src="playlist.images[0].url" alt="" @click="showTracks1()">
-        <span>{{playlist.name}}</span>
+        <img :src="playlist.images[0].url" alt="" @click="getTracks()">
+        <span>{{playlist.name}} {{playlist.tracks.total}}</span>
         <ul v-if="showTracks">
             <li v-for="track in tracks" :key="track.id">{{track.track.name}}</li>
         </ul>
@@ -26,7 +26,7 @@ export default {
         this.token = this.$ls.get('token')
     },
     methods:{
-        showTracks1(){
+        getTracks(){
             if(!this.tracksAreLoaded) this.fetchTracks()
             this.showTracks = !this.showTracks
         },
@@ -40,7 +40,7 @@ export default {
                 })
                 .catch(err => console.log(err))
 
-        }
-    }
+        },
+    },
 }
 </script>

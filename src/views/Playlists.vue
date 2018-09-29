@@ -1,7 +1,7 @@
 <template>
 <div>
     <h1>Playlists</h1>
-    <playlist v-for="playlist in playlists" :key="playlist.id" :playlist="playlist"></playlist>
+    <playlist v-for="playlist in filteredPlaylists" :key="playlist.id" :playlist="playlist"></playlist>
 </div>    
 </template>
 
@@ -35,6 +35,11 @@ export default {
                     if(res.data.next) this.getPlaylsits(res.data.next)
                 })
                 .catch(err => console.log(err))
+        }
+    },
+    computed: {
+        filteredPlaylists: function(){
+            return this.playlists.filter(playlist => playlist.images.length > 0)
         }
     }
 }
