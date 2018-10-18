@@ -9,6 +9,7 @@
     </div>
         <table v-if="showTracks">
             <thead>
+                <th>Nr</th>
                 <th>Name</th>
                 <th>Artists</th>
                 <th>Album</th>
@@ -16,7 +17,8 @@
                 <!-- <th>BPM</th> -->
                 <th>Added</th>
             </thead>
-            <tr v-for="track in tracks" :key="track.id" @click="openTrack(track.track.uri)">
+            <tr v-for="(track, index) in tracks" :key="track.id" @click="openTrack(track.track.uri)">
+                <td>{{ index + 1 }}</td>
                 <td>{{track.track.name || 'test'}}</td>
                 <td>{{displayArtists(track.track.artists) || 'test'}}</td>
                 <td>{{track.track.album.name || 'test'}}</td>
