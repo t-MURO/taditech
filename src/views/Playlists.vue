@@ -21,7 +21,6 @@ export default {
         Playlist
     },
     created(){
-        console.log('hi')
         this.token = this.$ls.get('token')
         if(this.token) this.getPlaylsits()
     },
@@ -46,11 +45,7 @@ export default {
 </script>
 
 <style scoped>
-*{
-  z-index: inherit;
-}
-
 h1{
-color: white;
+    color: white;
 }
 </style>
