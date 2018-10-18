@@ -6,9 +6,6 @@
             <h1>{{playlist.name}}</h1>
             {{playlist.tracks.total}} songs
         </div>
-        <!-- <ul v-if="showTracks"> -->
-            <!-- <li v-for="track in tracks" :key="track.id">{{track.track.name}}</li> -->
-        <!-- </ul> -->
     </div>
         <table v-if="showTracks">
             <thead>
