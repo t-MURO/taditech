@@ -36,7 +36,7 @@
           <v-list-tile-title>Settings</v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
-      <a href="https://taditech-backend.herokuapp.com/login">
+      <a href="https://taditech-backend-dev.herokuapp.com/login">
         <v-list-tile>
           <v-list-tile-action>
             <v-icon>warning</v-icon>
