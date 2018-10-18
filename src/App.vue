@@ -97,10 +97,6 @@ a{
   color:white;
 }
 
-aside{
-  opacity: .75;
-}
-
 .fullscreen-video-wrap{
   /* z-index: 0; */
   position:fixed;
