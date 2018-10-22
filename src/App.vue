@@ -70,13 +70,13 @@
 </template>
 
 <script>
-import Home from './views/Home'
+import NewReleases from './views/NewReleases'
 import Playlists from './views/Playlists'
 
 export default {
   name: 'App',
   components:{
-    Home,
+    NewReleases,
     Playlists
   },
   data () {

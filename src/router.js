@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Home from './views/Home.vue';
+import NewReleases from './views/NewReleases.vue';
 import About from './views/About.vue';
 import Playlists from './views/Playlists.vue';
 
@@ -12,8 +12,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: Home,
+      name: 'NewReleases',
+      component: NewReleases,
     },
     {
       path: '/about',

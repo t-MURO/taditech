@@ -11,13 +11,15 @@
 
 <script>
 import AlbumTilesContainer from '../components/AlbumTilesContainer'
+import loginCheck from '../mixins/loginCheck'
 import axios from 'axios'
 
 export default {
-  name: 'Home',
+  name: 'NewReleases',
   components:{
     AlbumTilesContainer
   },
+  mixins: [loginCheck],
   data(){
     return {
         token: null,
@@ -35,7 +37,6 @@ export default {
   created(){
     const url = new URL(window.location.href)
     this.token = url.searchParams.get('access_token')
-        console.log('home component loaded')
 
     if(this.token){
       this.$ls.set('token', this.token)
@@ -86,7 +87,7 @@ export default {
       if(group !== 'album' && group !== 'single'){
         console.log(`invalid group: ${group}`)
       }
-      const limit = customLimit || 3;
+      const limit = customLimit || 2;
       axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums?limit=${limit}&include_groups=${group}`, this.reqHeader())
         .then(res =>{
           this.simples.push(...res.data.items)
