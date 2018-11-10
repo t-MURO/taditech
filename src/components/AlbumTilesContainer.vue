@@ -28,7 +28,7 @@ export default {
   },
   computed:{
       albumsSortedByMonth(){
-            let temp = [...this.albums]
+            const temp = [...this.albums]
             return temp.reduce((groups, item) => {
                 const val = item['release_date'].slice(0,7)
                 groups[val] = groups[val] || []

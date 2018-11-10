@@ -131,7 +131,7 @@ export default {
       return this.albums.length === 0 || !this.albums.findIndex(existingAlbum => existingAlbum.id === album.id)
     },
     albumsToDisplay(){
-      let albums = []
+      const albums = []
       this.albumsSorted.some(sortedAlbum =>{
         if(sortedAlbum.release_date > this.timeframeStart){
           albums.push(sortedAlbum)
@@ -146,7 +146,7 @@ export default {
         if(this.completes < this.simples) return []
         this.limitHit = false
         this.loading = false
-        let temp = []
+        const temp = []
         this.completes.forEach(album => {
           if(album.release_date > this.timeframeStart
               && temp.findIndex(existingAlbum => existingAlbum.id === album.id) === -1) temp.push(album)
