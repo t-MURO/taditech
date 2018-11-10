@@ -36,7 +36,7 @@
           <v-list-tile-title>Settings</v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
-      <a href="https://taditech-backend-dev.herokuapp.com/login">
+      <a :href="authURL">
         <v-list-tile>
           <v-list-tile-action>
             <v-icon>warning</v-icon>
@@ -72,6 +72,7 @@
 <script>
 import NewReleases from './views/NewReleases'
 import Playlists from './views/Playlists'
+import config from './config'
 
 export default {
   name: 'App',
@@ -81,6 +82,7 @@ export default {
   },
   data () {
     return {
+      authURL: config.AUTH_URL,
       clipped: false,
       drawer: false,
       fixed: false,

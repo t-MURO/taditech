@@ -13,6 +13,7 @@
 import AlbumTilesContainer from '../components/AlbumTilesContainer'
 import loginCheck from '../mixins/loginCheck'
 import axios from 'axios'
+import config from '../config'
 
 export default {
   name: 'NewReleases',
@@ -67,7 +68,7 @@ export default {
             parseInt(err.response.headers['retry-after']) * 1010)
           } else if(err.response.status === 401){
             this.limitHit = true
-            window.location.replace('https://taditech-backend.herokuapp.com/login')
+            window.location.replace(config.AUTH_URL)
           }
         })
     },
@@ -189,7 +190,7 @@ export default {
       }
     }
 
-  }
+  },
 }
 </script>
 

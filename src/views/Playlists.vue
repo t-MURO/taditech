@@ -22,16 +22,16 @@ export default {
     },
     created(){
         this.token = this.$ls.get('token')
-        if(this.token) this.getPlaylsits()
+        if(this.token) this.getPlaylists()
     },
     methods:{
-        getPlaylsits(href){
+        getPlaylists(href){
             const url = href || 'https://api.spotify.com/v1/me/playlists?limit=50'
             axios.get(url,  {headers: {Authorization: 'Bearer ' + this.token}})
                 .then(res => {
                     this.playlists.push(...res.data.items)
                     console.log(`${this.playlists.length} playlists out of ${res.data.total} fetched`)
-                    if(res.data.next) this.getPlaylsits(res.data.next)
+                    if(res.data.next) this.getPlaylists(res.data.next)
                 })
                 .catch(err => console.log(err))
         }

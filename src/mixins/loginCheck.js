@@ -1,11 +1,10 @@
-import axios from 'axios'
-
 export default {
-  created() {
-      // this.hello()
+  mounted() {
+    this.checkIfUserLoggedIn()
   },
   methods: {
     checkIfUserLoggedIn() {
+      
       console.log('hello from mixin!')
     }
   }
