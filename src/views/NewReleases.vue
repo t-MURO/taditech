@@ -11,7 +11,7 @@
 
 <script>
 import AlbumTilesContainer from '../components/AlbumTilesContainer'
-import loginCheck from '../mixins/loginCheck'
+import errorHandling from '../mixins/errorHandling'
 import axios from 'axios'
 import config from '../config'
 
@@ -20,7 +20,7 @@ export default {
   components:{
     AlbumTilesContainer
   },
-  mixins: [loginCheck],
+  mixins: [errorHandling],
   data(){
     return {
         token: null,
@@ -43,8 +43,6 @@ export default {
       this.$ls.set('token', this.token)
         this.getFollowedArtists()
     }
-      
-
   },
   methods:{
     getFollowedArtists(href){
@@ -62,15 +60,7 @@ export default {
           if(res.data.artists.next) this.getFollowedArtists(res.data.artists.next)
           else this.getArtistsReleases()
         })
-        .catch(err => {
-          if(err.response.status === 429){
-            setTimeout(() => this.getFollowedArtists(url),
-            parseInt(err.response.headers['retry-after']) * 1010)
-          } else if(err.response.status === 401){
-            this.limitHit = true
-            window.location.replace(config.AUTH_URL)
-          }
-        })
+        .catch(err => this.handleError(err, () => this.getFollowedArtists(url)));
     },
 
     getArtistsReleases(){
@@ -101,13 +91,7 @@ export default {
             console.log(`${this.artists.length} artists | ${this.simples.length} album count | artistsCounterSingle: ${this.artistsCounterSingle}`)
           }
         })
-        .catch(err =>{
-          if(err.response.status === 429){
-            this.limitHit = true
-            setTimeout(() => this.fetchArtistsReleases(artistId, group, limit),
-            parseInt(err.response.headers['retry-after']) * 1010)
-          }
-        })
+        .catch(err => this.handleError(err, () => this.fetchArtistsReleases(artistId, group, limit)));
     },
 
     getFullAlbums(){
@@ -133,13 +117,7 @@ export default {
           this.completes.push(...res.data.albums)
           console.log(`${this.completes.length} out of ${this.simples.length} albums loaded | artistsCounter: ${this.artistsCounterAlbum}`)
         })
-        .catch(err =>{
-          if(err.response.status === 429){
-            this.limitHit = true
-            setTimeout(() => this.fetchFullAlbums(idsBatchString),
-            parseInt(err.response.headers['retry-after']) * 1010)
-          }
-        })
+        .catch(err => this.handleError(err, () => this.fetchFullAlbums(idsBatchString)));
     },
 
     reqHeader(){
