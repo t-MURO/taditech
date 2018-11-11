@@ -54,7 +54,7 @@ export default {
         },
         fetchTracks(href){
             const url = href || `https://api.spotify.com/v1/playlists/${this.playlist.id}/tracks`
-            axios.get(url, {headers: {Authorization: 'Bearer ' + this.token}})
+            axios.get(url, this.$store.getters.header)
                 .then(res => {
                     this.tracks.push(...res.data.items)
                     if(res.data.next) this.fetchTracks(res.data.next)

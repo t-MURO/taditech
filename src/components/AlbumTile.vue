@@ -21,8 +21,9 @@ export default {
   },
   methods:{
     debugging(){
-      this.album.artists.forEach((artist,index) => console.log(`Artist: ${this.album.artists[index].name} ID: ${this.album.artists[0].id} URL: ${this.album.artists[0].href}`))
-      console.log(`Album: ${this.album.name} ID: ${this.album.id}`)
+      this.album.artists.forEach((artist,index) => console.log(`Artist: ${this.album.artists[index].name} ID: ${this.album.artists[0].id} URL: ${this.album.artists[0].href}`));
+      console.log(`Album: ${this.album.name} ID: ${this.album.id}`);
+      console.log('~~~~~~~~~~~~~~~~~~~~~~');
     }
   },
   filters: {
@@ -50,11 +51,7 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-*{
-  /* z-index: inherit; */
-}
 .tile{
   color: white;
   text-decoration: none;

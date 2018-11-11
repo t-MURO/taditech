@@ -21,13 +21,18 @@ export default new Vuex.Store({
       context.commit('setToken', token);
     },
     setAlbums(context, albums){
-      albums.sort((a, b) => b.release_date > a.release_date);
-      context.commit('setAlbums', albums);
+      const albumsWithoutDoubleEntries = [];
+      
+      albums.forEach(album => {
+        if(!albumsWithoutDoubleEntries.some(item => album.id === item.id)) albumsWithoutDoubleEntries.push(album);
+      });
+
+      context.commit('setAlbums', albumsWithoutDoubleEntries);
     }
   },
   getters: {
-    header: state => { headers: { Authorization: 'Bearer ' + state.token } },
-    albums: state => state.albums
-    // albums: state => [...state.albums].sort((a, b) => b.release_date > a.release_date)
+    header: state =>{ return { headers: { Authorization: 'Bearer ' + state.token } }},
+    albums: state => state.albums,
+    token: state => state.token
   }
 });

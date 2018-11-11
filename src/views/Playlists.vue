@@ -27,7 +27,7 @@ export default {
     methods:{
         getPlaylists(href){
             const url = href || 'https://api.spotify.com/v1/me/playlists?limit=50'
-            axios.get(url,  {headers: {Authorization: 'Bearer ' + this.token}})
+            axios.get(url, this.$store.getters.header)
                 .then(res => {
                     this.playlists.push(...res.data.items)
                     console.log(`${this.playlists.length} playlists out of ${res.data.total} fetched`)

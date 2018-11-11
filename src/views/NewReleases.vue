@@ -1,19 +1,19 @@
 <template>
 <div>
     <div v-if="loading">
-      <h2>Loading data from Spotify <span v-if="limitHit"> API limit hit, loading can take longer</span></h2>
+      <h2>Loading data from Spotify</h2>
       <v-progress-linear :indeterminate="loading"></v-progress-linear>
     </div>
-      <album-tiles-container :albums="albumsSorted">
+      <album-tiles-container :albums="albums">
       </album-tiles-container>
 </div>
 </template>
 
 <script>
-import AlbumTilesContainer from '../components/AlbumTilesContainer'
+import AlbumTilesContainer from '../components/AlbumTilesContainer';
 // import errorHandling from '../mixins/errorHandling'
-import axios from 'axios'
-import config from '../config'
+import axios from 'axios';
+import config from '../config';
 
 export default {
   name: 'NewReleases',
@@ -23,151 +23,123 @@ export default {
   // mixins: [errorHandling],
   data(){
     return {
-        token: null,
         artists:[],
         artistsCounterAlbum: 0,
         artistsCounterSingle: 0,
         simples:[],
         completes:[],
-        albumsSorted: [],
-        timeframeStart: '2018-08',
         loading: false,
-        limitHit: false
+        limitHit: false,
+        reqHeader: {}
     }
   },
   created(){
-    const url = new URL(window.location.href)
-    this.token = url.searchParams.get('access_token')
-
-    if(this.token){
-      this.$ls.set('token', this.token)
-        this.getFollowedArtists()
-    }
+    this.reqHeader = this.$store.getters.header;
+    this.getNewReleases();
   },
   methods:{
+    getNewReleases(){
+      if(this.$store.getters.albums.length <= 0) this.getFollowedArtists();
+    },
     getFollowedArtists(href){
-      this.loading = true
-      const limit = 50
-      const type = 'artist'
-      const params = `?type=${type}&limit=${limit}`
-      const url = href || `https://api.spotify.com/v1/me/following${params}`
+      this.loading = true;
+      const limit = 50;
+      const type = 'artist';
+      const params = `?type=${type}&limit=${limit}`;
+      const url = href || `https://api.spotify.com/v1/me/following${params}`;
       
-      axios.get(url, this.reqHeader())
+      axios.get(url, this.reqHeader)
         .then(res =>{
-          console.log(`fetched ${res.data.artists.items.length} out of ${res.data.artists.total} artists`)
-          this.artists.push(...res.data.artists.items)
-          if(res.data.artists.next) this.getFollowedArtists(res.data.artists.next)
-          else this.getArtistsReleases()
+          console.log(`fetched ${res.data.artists.items.length} out of ${res.data.artists.total} artists`);
+          this.artists.push(...res.data.artists.items);
+          if(res.data.artists.next) this.getFollowedArtists(res.data.artists.next);
+          else this.getArtistsReleases();
         })
         .catch(err => this.handleError(err, () => this.getFollowedArtists(url)));
     },
 
     getArtistsReleases(){
-      this.simples = []
-      this.artistsCounterAlbum = 0
-      this.artistsCounterSingle = 0
-      console.log(this.artists.length)
+      this.simples = [];
+      this.artistsCounterAlbum = 0;
+      this.artistsCounterSingle = 0;
       this.artists.forEach((artist, index) => {
-        this.fetchArtistsReleases(artist.id, 'album')
-        this.fetchArtistsReleases(artist.id, 'single')
+        this.fetchArtistsReleases(artist.id, 'album');
+        this.fetchArtistsReleases(artist.id, 'single');
       })
     },
 
     fetchArtistsReleases(artistId, group, customLimit){
       if(group !== 'album' && group !== 'single'){
-        console.log(`invalid group: ${group}`)
+        console.log(`invalid group: ${group}`);
       }
       const limit = customLimit || 2;
-      axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums?limit=${limit}&include_groups=${group}`, this.reqHeader())
+      axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums?limit=${limit}&include_groups=${group}`, this.reqHeader)
         .then(res =>{
-          this.simples.push(...res.data.items)
+          this.simples.push(...res.data.items);
 
           if(group === 'album'){
-            this.artistsCounterAlbum++
-            console.log(`${this.artists.length} artists | ${this.simples.length} album count | artistsCounterAlbum: ${this.artistsCounterAlbum}`)
+            this.artistsCounterAlbum++;
+            console.log(`${this.artists.length} artists | ${this.simples.length} album count | artistsCounterAlbum: ${this.artistsCounterAlbum}`);
           } else if(group === 'single'){
             this.artistsCounterSingle++
-            console.log(`${this.artists.length} artists | ${this.simples.length} album count | artistsCounterSingle: ${this.artistsCounterSingle}`)
+            console.log(`${this.artists.length} artists | ${this.simples.length} album count | artistsCounterSingle: ${this.artistsCounterSingle}`);
           }
         })
         .catch(err => this.handleError(err, () => this.fetchArtistsReleases(artistId, group, limit)));
     },
 
     getFullAlbums(){
-      let batch = []
-      console.log(`rest is ${this.simples.length % 20}`)
+      let batch = [];
+      console.log(`rest is ${this.simples.length % 20}`);
       this.simples.forEach(simple => {
         if(batch.length >= 20){
-          if(batch.length > 20 ) console.log('we have a problem')
-            this.fetchFullAlbums(batch.toString())
-            batch = []
+          this.fetchFullAlbums(batch.toString());
+          batch = [];
         } 
-        batch.push(simple.id)
-        
+        batch.push(simple.id);
       })
       if(batch.length > 0) {
-        this.fetchFullAlbums(batch.toString())
+        this.fetchFullAlbums(batch.toString());
       }
     },
 
     fetchFullAlbums(idsBatchString){
-      axios.get(`https://api.spotify.com/v1/albums?ids=${idsBatchString}`, this.reqHeader())
+      axios.get(`https://api.spotify.com/v1/albums?ids=${idsBatchString}`, this.reqHeader)
         .then(res => {
-          this.completes.push(...res.data.albums)
-          console.log(`${this.completes.length} out of ${this.simples.length} albums loaded | artistsCounter: ${this.artistsCounterAlbum}`)
+          this.completes.push(...res.data.albums);
+          console.log(`${this.completes.length} out of ${this.simples.length} albums loaded | artistsCounter: ${this.artistsCounterAlbum}`);
         })
         .catch(err => this.handleError(err, () => this.fetchFullAlbums(idsBatchString)));
     },
 
-    reqHeader(){
-      return {
-        headers: {
-          Authorization: 'Bearer ' + this.token
-        }
-      }
-    },
-    uniqueAlbum(album){
-      return this.albums.length === 0 || !this.albums.findIndex(existingAlbum => existingAlbum.id === album.id)
-    },
-    albumsToDisplay(){
-      const albums = []
-      this.albumsSorted.some(sortedAlbum =>{
-        if(sortedAlbum.release_date > this.timeframeStart){
-          albums.push(sortedAlbum)
-        } else return true
-      })
-      console.log(albums.length)
-      return albums
-    },
   },
   watch: {
     completes: function(){
-        if(this.completes < this.simples) return []
-        this.limitHit = false
-        this.loading = false
-        const temp = []
-        this.completes.forEach(album => {
-          if(album.release_date > this.timeframeStart
-              && temp.findIndex(existingAlbum => existingAlbum.id === album.id) === -1) temp.push(album)
-        })
-        temp.sort((a,b)=> b.release_date > a.release_date)
-        this.albumsSorted = temp
-        console.log(this.albumsSorted.length)
+        if(this.completes < this.simples) return [];
+        this.limitHit = false;
+        this.loading = false;
+        const temp = [...this.completes];
+        this.$store.dispatch('setAlbums', temp);
     },
     artistsCounterSingle: function() {
       if (this.artistsCounterSingle === this.artists.length && this.artistsCounterAlbum === this.artists.length){
-        console.log('getting full albums now')
-        this.getFullAlbums()
+        console.log('getting full albums now');
+        this.getFullAlbums();
       }
     },
     artistsCounterAlbum: function() {
       if (this.artistsCounterSingle === this.artists.length && this.artistsCounterAlbum === this.artists.length){
-        console.log('getting full albums now')
-        this.getFullAlbums()
+        console.log('getting full albums now');
+        this.getFullAlbums();
       }
     }
 
   },
+  computed: {
+    albums: function(){
+      return this.$store.getters.albums;
+    }
+  }
 }
 </script>
 
