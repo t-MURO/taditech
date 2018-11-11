@@ -8,13 +8,13 @@
     fixed
     app>
     <v-list dense>
-      <router-link to="/about">
+      <router-link to="/new-releases">
         <v-list-tile>
           <v-list-tile-action>
-            <v-icon>dashboard</v-icon>
+            <v-icon>new_releases</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>About</v-list-tile-title>
+            <v-list-tile-title>New Releases</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </router-link>
@@ -28,21 +28,13 @@
           </v-list-tile-content>
         </v-list-tile>
       </router-link>
-      <v-list-tile>
-        <v-list-tile-action>
-          <v-icon>settings</v-icon>
-        </v-list-tile-action>
-        <v-list-tile-content>
-          <v-list-tile-title>Settings</v-list-tile-title>
-        </v-list-tile-content>
-      </v-list-tile>
-      <a href="https://taditech-backend-dev.herokuapp.com/login">
+      <a href="/login">
         <v-list-tile>
           <v-list-tile-action>
-            <v-icon>warning</v-icon>
+            <v-icon>power_settings_new</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Login</v-list-tile-title>
+            <v-list-tile-title>Logout</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </a>
@@ -72,6 +64,7 @@
 <script>
 import NewReleases from './views/NewReleases'
 import Playlists from './views/Playlists'
+import config from './config'
 
 export default {
   name: 'App',
@@ -81,6 +74,7 @@ export default {
   },
   data () {
     return {
+      authURL: config.AUTH_URL,
       clipped: false,
       drawer: false,
       fixed: false,

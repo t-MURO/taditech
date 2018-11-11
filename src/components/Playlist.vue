@@ -54,17 +54,17 @@ export default {
         },
         fetchTracks(href){
             const url = href || `https://api.spotify.com/v1/playlists/${this.playlist.id}/tracks`
-            axios.get(url, {headers: {Authorization: 'Bearer ' + this.token}})
+            axios.get(url, this.$store.getters.header)
                 .then(res => {
                     this.tracks.push(...res.data.items)
                     if(res.data.next) this.fetchTracks(res.data.next)
                     else this.tracksAreLoaded = true
                 })
-                .catch(err => console.log(err))
+                .catch(err => this.handleError(err, () => this.fetchTracks(url)));
         },
         displayArtists(artists){
-            let out = ''
-            artists.forEach(artist => out+=artist.name+', ')
+            const out = ''
+            artists.forEach(artist => out.concat(artist.name+', '))
             return out.substring(0, out.length-2)
         },
         openTrack(uri){
