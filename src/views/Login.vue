@@ -6,12 +6,13 @@
 </template>
 
 <script>
+import config from '../config';
 
 export default {
     name: 'login',
     methods: {
         redirectToAuth(){
-            window.location() //replace
+            window.location.replace(config.AUTH_URL);
         }
     }
 }

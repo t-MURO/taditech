@@ -63,8 +63,8 @@ export default {
                 .catch(err => console.log(err))
         },
         displayArtists(artists){
-            let out = ''
-            artists.forEach(artist => out+=artist.name+', ')
+            const out = ''
+            artists.forEach(artist => out.concat(artist.name+', '))
             return out.substring(0, out.length-2)
         },
         openTrack(uri){
