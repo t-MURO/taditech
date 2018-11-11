@@ -3,6 +3,8 @@ import Router from 'vue-router';
 import NewReleases from './views/NewReleases.vue';
 import About from './views/About.vue';
 import Playlists from './views/Playlists.vue';
+import Login from './views/Login.vue';
+import Index from './views/Index';
 
 Vue.use(Router);
 
@@ -12,7 +14,12 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'NewReleases',
+      name: 'index',
+      component: Index,
+    },
+    {
+      path: '/new-releases',
+      name: 'new-releases',
       component: NewReleases,
     },
     {
@@ -28,6 +35,11 @@ export default new Router({
       path: '/playlists',
       name: 'playlists',
       component: Playlists
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
     }
   ],
 });
