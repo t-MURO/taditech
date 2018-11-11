@@ -11,7 +11,7 @@
 
 <script>
 import AlbumTilesContainer from '../components/AlbumTilesContainer'
-import errorHandling from '../mixins/errorHandling'
+// import errorHandling from '../mixins/errorHandling'
 import axios from 'axios'
 import config from '../config'
 
@@ -20,7 +20,7 @@ export default {
   components:{
     AlbumTilesContainer
   },
-  mixins: [errorHandling],
+  // mixins: [errorHandling],
   data(){
     return {
         token: null,
@@ -51,7 +51,6 @@ export default {
       const type = 'artist'
       const params = `?type=${type}&limit=${limit}`
       const url = href || `https://api.spotify.com/v1/me/following${params}`
-      console.log(url)
       
       axios.get(url, this.reqHeader())
         .then(res =>{

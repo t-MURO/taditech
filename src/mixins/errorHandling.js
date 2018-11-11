@@ -1,3 +1,4 @@
+import router from '../router';
 export default {
     methods: {
         handleError: function(err, cb) {
@@ -5,9 +6,8 @@ export default {
                 setTimeout(() => {
                     cb();
                 }, parseInt(err.response.headers['retry-after']) * 1000);
-            } else if(err.response.status === 401){
-                console.log(err);
-                this.router.push('login');
+            } else if(err.response.status === 401 || err.response.status === 400){
+                router.push('login');
             }
         }
     }

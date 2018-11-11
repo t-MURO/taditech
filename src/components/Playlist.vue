@@ -60,7 +60,7 @@ export default {
                     if(res.data.next) this.fetchTracks(res.data.next)
                     else this.tracksAreLoaded = true
                 })
-                .catch(err => console.log(err))
+                .catch(err => this.handleError(err, () => this.fetchTracks(url)));
         },
         displayArtists(artists){
             const out = ''

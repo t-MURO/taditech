@@ -33,7 +33,7 @@ export default {
                     console.log(`${this.playlists.length} playlists out of ${res.data.total} fetched`)
                     if(res.data.next) this.getPlaylists(res.data.next)
                 })
-                .catch(err => console.log(err))
+                .catch(err => this.handleError(err, () => this.getPlaylists(url)));
         }
     },
     computed: {
