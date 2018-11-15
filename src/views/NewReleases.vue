@@ -80,9 +80,8 @@ export default {
         })
         .catch(err => this.handleError(err, () => this.fetchArtistsReleases(artistId, group, limit)));
     },
-    checkIfFetchingComplete(){
+    checkIfFetchingCompleteAndSetAlbums(){
       if (this.artistsCounterSingle === this.artists.length && this.artistsCounterAlbum === this.artists.length){
-        this.limitHit = false;
         this.loading = false;
         this.$store.dispatch('setAlbums', this.fetchedAblums);
       }
@@ -93,10 +92,10 @@ export default {
     //   this.$store.dispatch('setAlbums', this.fetchedAblums);
     // },
     artistsCounterSingle: function() {
-      this.checkIfFetchingComplete();
+      this.checkIfFetchingCompleteAndSetAlbums();
     },
     artistsCounterAlbum: function() {
-      this.checkIfFetchingComplete();
+      this.checkIfFetchingCompleteAndSetAlbums();
     }
 
   },
