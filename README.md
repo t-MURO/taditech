@@ -11,13 +11,7 @@ npm install
 
 ### Compiles and hot-reloads for development
 
-to have this working in a local environment change 
-AUTH_URL to 'https://taditech-backend-dev.herokuapp.com/login'
-in the config.js file
-
-I'll add an .env file soon...
-
-It is important that you run this in port 8080!
+It is important that you run this in port 8080 since the development backend redirects to that port!
 
 ```
 npm run serve
