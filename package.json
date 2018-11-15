@@ -23,6 +23,7 @@
     "@vue/cli-service": "^3.0.0",
     "@vue/eslint-config-airbnb": "^3.0.0",
     "babel-plugin-transform-imports": "^1.4.1",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
     "vue-cli-plugin-vuetify": "^0.1.6",
