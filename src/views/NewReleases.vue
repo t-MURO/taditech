@@ -11,7 +11,6 @@
 
 <script>
 import AlbumTilesContainer from '../components/AlbumTilesContainer';
-// import errorHandling from '../mixins/errorHandling'
 import axios from 'axios';
 import config from '../config';
 
@@ -20,16 +19,13 @@ export default {
   components:{
     AlbumTilesContainer
   },
-  // mixins: [errorHandling],
   data(){
     return {
         artists:[],
         artistsCounterAlbum: 0,
         artistsCounterSingle: 0,
-        simples:[],
-        completes:[],
+        fetchedAblums:[],
         loading: false,
-        limitHit: false,
         reqHeader: {}
     }
   },
@@ -46,7 +42,7 @@ export default {
       const limit = 50;
       const type = 'artist';
       const params = `?type=${type}&limit=${limit}`;
-      const url = href || `https://api.spotify.com/v1/me/following${params}`;
+      const url = href || `${config.FOLLOWED_ARTISTS_URL}${params}`;
       
       axios.get(url, this.reqHeader)
         .then(res =>{
@@ -59,7 +55,7 @@ export default {
     },
 
     getArtistsReleases(){
-      this.simples = [];
+      this.fetchedAblums = [];
       this.artistsCounterAlbum = 0;
       this.artistsCounterSingle = 0;
       this.artists.forEach((artist, index) => {
@@ -69,69 +65,38 @@ export default {
     },
 
     fetchArtistsReleases(artistId, group, customLimit){
-      if(group !== 'album' && group !== 'single'){
-        console.log(`invalid group: ${group}`);
-      }
       const limit = customLimit || 2;
-      axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums?limit=${limit}&include_groups=${group}`, this.reqHeader)
+      axios.get(`${config.ARTISTS_URL}${artistId}/albums?limit=${limit}&include_groups=${group}`, this.reqHeader)
         .then(res =>{
-          this.simples.push(...res.data.items);
+          this.fetchedAblums.push(...res.data.items);
 
           if(group === 'album'){
             this.artistsCounterAlbum++;
-            console.log(`${this.artists.length} artists | ${this.simples.length} album count | artistsCounterAlbum: ${this.artistsCounterAlbum}`);
+            console.log(`${this.artists.length} artists | ${this.fetchedAblums.length} album count | artistsCounterAlbum: ${this.artistsCounterAlbum}`);
           } else if(group === 'single'){
             this.artistsCounterSingle++
-            console.log(`${this.artists.length} artists | ${this.simples.length} album count | artistsCounterSingle: ${this.artistsCounterSingle}`);
+            console.log(`${this.artists.length} artists | ${this.fetchedAblums.length} album count | artistsCounterSingle: ${this.artistsCounterSingle}`);
           }
         })
         .catch(err => this.handleError(err, () => this.fetchArtistsReleases(artistId, group, limit)));
     },
-
-    getFullAlbums(){
-      let batch = [];
-      console.log(`rest is ${this.simples.length % 20}`);
-      this.simples.forEach(simple => {
-        if(batch.length >= 20){
-          this.fetchFullAlbums(batch.toString());
-          batch = [];
-        } 
-        batch.push(simple.id);
-      })
-      if(batch.length > 0) {
-        this.fetchFullAlbums(batch.toString());
-      }
-    },
-
-    fetchFullAlbums(idsBatchString){
-      axios.get(`https://api.spotify.com/v1/albums?ids=${idsBatchString}`, this.reqHeader)
-        .then(res => {
-          this.completes.push(...res.data.albums);
-          console.log(`${this.completes.length} out of ${this.simples.length} albums loaded | artistsCounter: ${this.artistsCounterAlbum}`);
-        })
-        .catch(err => this.handleError(err, () => this.fetchFullAlbums(idsBatchString)));
-    },
-
-  },
-  watch: {
-    completes: function(){
-        if(this.completes < this.simples) return [];
+    checkIfFetchingComplete(){
+      if (this.artistsCounterSingle === this.artists.length && this.artistsCounterAlbum === this.artists.length){
         this.limitHit = false;
         this.loading = false;
-        const temp = [...this.completes];
-        this.$store.dispatch('setAlbums', temp);
-    },
-    artistsCounterSingle: function() {
-      if (this.artistsCounterSingle === this.artists.length && this.artistsCounterAlbum === this.artists.length){
-        console.log('getting full albums now');
-        this.getFullAlbums();
+        this.$store.dispatch('setAlbums', this.fetchedAblums);
       }
+    }
+  },
+  watch: {
+    // fetchedAblums: function(){
+    //   this.$store.dispatch('setAlbums', this.fetchedAblums);
+    // },
+    artistsCounterSingle: function() {
+      this.checkIfFetchingComplete();
     },
     artistsCounterAlbum: function() {
-      if (this.artistsCounterSingle === this.artists.length && this.artistsCounterAlbum === this.artists.length){
-        console.log('getting full albums now');
-        this.getFullAlbums();
-      }
+      this.checkIfFetchingComplete();
     }
 
   },
