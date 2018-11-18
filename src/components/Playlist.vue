@@ -41,11 +41,7 @@ export default {
             tracks: [],
             showTracks: false,
             tracksAreLoaded: false,
-            token: null
         }
-    },
-    created(){
-        this.token = this.$ls.get('token')
     },
     methods:{
         getTracks(){

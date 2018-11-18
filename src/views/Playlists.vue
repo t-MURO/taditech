@@ -20,10 +20,6 @@ export default {
     components: {
         Playlist
     },
-    created(){
-        this.token = this.$ls.get('token')
-        if(this.token) this.getPlaylists()
-    },
     methods:{
         getPlaylists(href){
             const url = href || 'https://api.spotify.com/v1/me/playlists?limit=50'
