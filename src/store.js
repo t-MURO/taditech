@@ -1,12 +1,14 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import axios from 'axios';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     token: null,
-    albums: []
+    albums: [],
+    user: null
   },
   mutations: {
     setToken(state, token){
@@ -14,10 +16,15 @@ export default new Vuex.Store({
     },
     setAlbums(state, albums){
       state.albums = albums;
+    },
+    setUser(state, user){
+      state.user = user;
     }
   },
   actions: {
     setToken(context, token){
+      axios.get('https://api.spotify.com/v1/me', { headers: { Authorization: 'Bearer ' + token } })
+        .then(res => context.commit('setUser', res.data));
       context.commit('setToken', token);
     },
     setAlbums(context, albums){
