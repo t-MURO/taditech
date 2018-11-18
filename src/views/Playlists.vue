@@ -20,6 +20,9 @@ export default {
     components: {
         Playlist
     },
+    created(){
+        this.getPlaylists();
+    },
     methods:{
         getPlaylists(href){
             const url = href || 'https://api.spotify.com/v1/me/playlists?limit=50'
@@ -39,9 +42,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-h1{
-    color: white;
-}
-</style>

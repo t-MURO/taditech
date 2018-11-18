@@ -8,7 +8,7 @@
     fixed
     app>
     <v-list dense>
-      <router-link to="/new-releases">
+      <router-link to="new-releases">
         <v-list-tile>
           <v-list-tile-action>
             <v-icon>new_releases</v-icon>
@@ -18,13 +18,23 @@
           </v-list-tile-content>
         </v-list-tile>
       </router-link>
-      <router-link to="/playlists">
+      <router-link to="playlists">
         <v-list-tile>
           <v-list-tile-action>
             <v-icon>library_music</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
             <v-list-tile-title>Playlists</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </router-link>
+      <router-link to="about">
+        <v-list-tile>
+          <v-list-tile-action>
+            <v-icon>info</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>About</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </router-link>
@@ -62,16 +72,10 @@
 </template>
 
 <script>
-import NewReleases from './views/NewReleases'
-import Playlists from './views/Playlists'
 import config from './config'
 
 export default {
   name: 'App',
-  components:{
-    NewReleases,
-    Playlists
-  },
   data () {
     return {
       authURL: config.AUTH_URL,
