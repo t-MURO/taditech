@@ -37,7 +37,7 @@ export default {
     },
     computed: {
         filteredPlaylists: function(){
-            return this.playlists.filter(playlist => playlist.images.length > 0)
+            return this.playlists.filter(playlist => playlist.owner.id === this.$store.getters.user.id && playlist.images.length > 0)
         }
     }
 }

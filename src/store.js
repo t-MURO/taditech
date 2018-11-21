@@ -40,6 +40,7 @@ export default new Vuex.Store({
   getters: {
     header: state =>{ return { headers: { Authorization: 'Bearer ' + state.token } }},
     albums: state => state.albums,
-    token: state => state.token
+    token: state => state.token,
+    user: state => state.user
   }
 });
