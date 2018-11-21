@@ -1,8 +1,7 @@
 <template>
     <div class="playlist-container">
-        <v-btn @click="debug()">info</v-btn>
         <v-btn @click="sort()" @contextmenu="sort(true)">sort locally</v-btn> 
-        <v-btn @click="reorderPlaylist()">reorder all</v-btn> 
+        <v-btn @click="reorder()">reorder all</v-btn> 
         <div class="playlist" @click="getTracks()">
             <img :src="playlist.images[0].url" alt="">
             <div class="metadata">
@@ -10,7 +9,7 @@
                 {{playlist.tracks.total}} songs
             </div>
         </div>
-        <table v-if="true">
+        <table v-if="showTracks">
             <thead>
                 <th>Nr</th>
                 <th>Name</th>
@@ -26,7 +25,6 @@
                 <td>{{displayArtists(track.track.artists) || 'test'}}</td>
                 <td>{{track.track.album.name || 'test'}}</td>
                 <td>{{millisToMinutesAndSeconds(track.track.duration_ms) || 'test'}}</td>
-                <!-- <td>{{ track.track. }}</td> -->
                 <td>{{track.added_at || 'test'}}</td>
             </tr>
         </table>
@@ -50,25 +48,23 @@ export default {
     },
     methods:{
         getTracks(){
-            // if(!this.tracksAreLoaded) this.fetchTracks()
-            // this.showTracks = !this.showTracks
-            this.tracks = []
-            this.fetchTracks()
+            if(!this.tracksAreLoaded) this.fetchTracks();
+            this.showTracks = !this.showTracks;
         },
         fetchTracks(href){
             const url = href || `https://api.spotify.com/v1/playlists/${this.playlist.id}/tracks`
             axios.get(url, this.$store.getters.header)
                 .then(res => {
-                    
                     this.tracks.push(...res.data.items)
                     if(res.data.next) this.fetchTracks(res.data.next)
-                    // else this.tracksAreLoaded = true
+                    else this.tracksAreLoaded = true
                 })
                 .catch(err => this.handleError(err, () => this.fetchTracks(url)));
         },
         displayArtists(artists){
-            const out = ''
-            artists.forEach(artist => out.concat(artist.name+', '))
+            let out = '';
+            artists.forEach(artist => out += artist.name+', ');
+            console.log(out)
             return out.substring(0, out.length-2)
         },
         openTrack(uri){
@@ -109,9 +105,6 @@ export default {
             this.tracks.forEach(track => test2 += track.track.name + ' | ')
             console.log(test1)
             console.log(test2)
-        },
-        reorderPlaylist(){
-            this.reorder();
         },
     },
     watch:{
