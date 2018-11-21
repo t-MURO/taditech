@@ -1,13 +1,16 @@
 <template>
     <div class="playlist-container">
-    <div class="playlist" @click="getTracks()">
-        <img :src="playlist.images[0].url" alt="">
-        <div class="metadata">
-            <h1>{{playlist.name}}</h1>
-            {{playlist.tracks.total}} songs
+        <v-btn @click="debug()">info</v-btn>
+        <v-btn @click="sort()" @contextmenu="sort(true)">sort locally</v-btn> 
+        <v-btn @click="reorderPlaylist()">reorder all</v-btn> 
+        <div class="playlist" @click="getTracks()">
+            <img :src="playlist.images[0].url" alt="">
+            <div class="metadata">
+                <h1>{{playlist.name}}</h1>
+                {{playlist.tracks.total}} songs
+            </div>
         </div>
-    </div>
-        <table v-if="showTracks">
+        <table v-if="true">
             <thead>
                 <th>Nr</th>
                 <th>Name</th>
@@ -41,20 +44,25 @@ export default {
             tracks: [],
             showTracks: false,
             tracksAreLoaded: false,
+            tracksCopyForSorting: [],
+            index: 0
         }
     },
     methods:{
         getTracks(){
-            if(!this.tracksAreLoaded) this.fetchTracks()
-            this.showTracks = !this.showTracks
+            // if(!this.tracksAreLoaded) this.fetchTracks()
+            // this.showTracks = !this.showTracks
+            this.tracks = []
+            this.fetchTracks()
         },
         fetchTracks(href){
             const url = href || `https://api.spotify.com/v1/playlists/${this.playlist.id}/tracks`
             axios.get(url, this.$store.getters.header)
                 .then(res => {
+                    
                     this.tracks.push(...res.data.items)
                     if(res.data.next) this.fetchTracks(res.data.next)
-                    else this.tracksAreLoaded = true
+                    // else this.tracksAreLoaded = true
                 })
                 .catch(err => this.handleError(err, () => this.fetchTracks(url)));
         },
@@ -70,15 +78,54 @@ export default {
             let minutes = Math.floor(millis / 60000);
             let seconds = ((millis % 60000) / 1000).toFixed(0);
             return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
-        }
+        },
+        reorder(sortedTracks, pos){
+            sortedTracks = sortedTracks || [...this.tracksCopyForSorting];
+            pos = pos || 0;
+            const originalIndex = this.tracks.findIndex(track => track === sortedTracks[pos]);
+            if(pos >= this.tracks.length) return;
+            if(pos === originalIndex) return this.reorder(sortedTracks, pos+1);
+            axios.put(`https://api.spotify.com/v1/playlists/${this.playlist.id}/tracks`,
+                {
+                    range_start: originalIndex,
+                    insert_before: pos,
+                    snapshot_id: this.playlist.snapshot_id 
+                },
+                this.$store.getters.header)
+                .then(res => {
+                    console.log(`put song at index ${originalIndex} to index ${pos}`)
+                    this.tracks.splice(pos, 0, this.tracks.splice(originalIndex, 1)[0]);
+                    this.playlist.snapshot_id = res.data.snapshot_id;
+                    if(pos < sortedTracks.length) this.reorder(sortedTracks, pos+1);
+                })
+                .catch(err => this.handleError(err, () => this.reorder(sortedTracks, pos)));
+        },
+        sort(bool){
+            if(bool) this.tracksCopyForSorting.sort((a,b) => a.added_at < b.added_at ? -1 : 1);
+            else this.tracksCopyForSorting.sort((a,b) => a.added_at > b.added_at ? -1 : 1);
+            let test1 = '';
+            let test2 = '';
+            this.tracksCopyForSorting.forEach(track => test1 += track.track.name + ' | ')
+            this.tracks.forEach(track => test2 += track.track.name + ' | ')
+            console.log(test1)
+            console.log(test2)
+        },
+        reorderPlaylist(){
+            this.reorder();
+        },
     },
+    watch:{
+        tracks: function() {
+            this.tracksCopyForSorting = [...this.tracks];
+        }
+    }
 }
 </script>
 
 <style scoped>
 
 .playlist-container{
-    margin-bottom: 3em;
+    margin-bottom: 1.75em;
 }
 
 .playlist-container:hover{
