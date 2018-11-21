@@ -74,6 +74,7 @@ export default {
                         const index = this.tracks.findIndex(track => track.track.id === tracksAudioFeatures.id);
                         this.tracks[index].features = tracksAudioFeatures;
                     });
+                    this.$forceUpdate();
                 })
                 .catch(err => this.handleError(err, () => this.fetchAudioFeatures(tracks)))
         },
