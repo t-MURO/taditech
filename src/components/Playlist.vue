@@ -16,7 +16,8 @@
                 <th>Artists</th>
                 <th>Album</th>
                 <th>Duration</th>
-                <!-- <th>BPM</th> -->
+                <th>BPM</th>
+                <th>Key</th>
                 <th>Added</th>
             </thead>
             <tr v-for="(track, index) in tracks" :key="track.id" @click="openTrack(track.track.uri)">
@@ -25,6 +26,8 @@
                 <td>{{displayArtists(track.track.artists) || 'test'}}</td>
                 <td>{{track.track.album.name || 'test'}}</td>
                 <td>{{millisToMinutesAndSeconds(track.track.duration_ms) || 'test'}}</td>
+                <td>{{ getBpm(track) }}</td>
+                <td>{{ getKey(track) }}</td>
                 <td>{{track.added_at || 'test'}}</td>
             </tr>
         </table>
@@ -52,20 +55,32 @@ export default {
             this.showTracks = !this.showTracks;
         },
         fetchTracks(href){
-            const url = href || `https://api.spotify.com/v1/playlists/${this.playlist.id}/tracks`
+            const url = href || `https://api.spotify.com/v1/playlists/${this.playlist.id}/tracks`;
             axios.get(url, this.$store.getters.header)
                 .then(res => {
-                    this.tracks.push(...res.data.items)
-                    if(res.data.next) this.fetchTracks(res.data.next)
-                    else this.tracksAreLoaded = true
+                    this.tracks.push(...res.data.items);
+                    this.fetchAudioFeatures(res.data.items);
+                    if(res.data.next) this.fetchTracks(res.data.next);
+                    else this.tracksAreLoaded = true;
                 })
                 .catch(err => this.handleError(err, () => this.fetchTracks(url)));
+        },
+        fetchAudioFeatures(tracks){
+            const ids = [];
+            tracks.forEach(track => ids.push(track.track.id));
+            axios.get(`https://api.spotify.com/v1/audio-features/?ids=${ids.toString()}`, this.$store.getters.header)
+                .then(res => {
+                    res.data.audio_features.forEach( tracksAudioFeatures => {
+                        const index = this.tracks.findIndex(track => track.track.id === tracksAudioFeatures.id);
+                        this.tracks[index].features = tracksAudioFeatures;
+                    });
+                })
+                .catch(err => this.handleError(err, () => this.fetchAudioFeatures(tracks)))
         },
         displayArtists(artists){
             let out = '';
             artists.forEach(artist => out += artist.name+', ');
-            console.log(out)
-            return out.substring(0, out.length-2)
+            return out.substring(0, out.length-2);
         },
         openTrack(uri){
             window.open(uri, '_parent')
@@ -105,6 +120,12 @@ export default {
             this.tracks.forEach(track => test2 += track.track.name + ' | ')
             console.log(test1)
             console.log(test2)
+        },
+        getBpm(track){
+            return track.features ? Math.round(track.features.tempo) : '';
+        },
+        getKey(track){
+            return track.features ? Math.round(track.features.key) : '';
         },
     },
     watch:{
