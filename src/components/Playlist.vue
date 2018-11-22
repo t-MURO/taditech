@@ -2,6 +2,7 @@
     <div class="playlist-container">
         <v-btn @click="sort()" @contextmenu="sort(true)">sort locally</v-btn> 
         <v-btn @click="reorder()">reorder all</v-btn> 
+        <v-btn @click="debug()">debug</v-btn> 
         <div class="playlist" @click="getTracks()">
             <img :src="playlist.images[0].url" alt="">
             <div class="metadata">
@@ -9,28 +10,31 @@
                 {{playlist.tracks.total}} songs
             </div>
         </div>
-        <table v-if="showTracks">
-            <thead>
-                <th>Nr</th>
-                <th>Name</th>
-                <th>Artists</th>
-                <th>Album</th>
-                <th>Duration</th>
-                <th>BPM</th>
-                <th>Key</th>
-                <th>Added</th>
-            </thead>
-            <tr v-for="(track, index) in tracks" :key="track.id" @click="openTrack(track.track.uri)">
-                <td>{{ index + 1 }}</td>
-                <td>{{track.track.name || 'test'}}</td>
-                <td>{{displayArtists(track.track.artists) || 'test'}}</td>
-                <td>{{track.track.album.name || 'test'}}</td>
-                <td>{{millisToMinutesAndSeconds(track.track.duration_ms) || 'test'}}</td>
-                <td>{{ getBpm(track) }}</td>
-                <td>{{ getKey(track) }}</td>
-                <td>{{track.added_at || 'test'}}</td>
-            </tr>
-        </table>
+        <v-data-table
+            v-if="showTracks"
+            :headers="headers"
+            :items="tracks"
+            :loading="reorderingProgressPercentage > 0"
+            v-model="test"
+            class="elevation-1"
+            >
+            <!-- pagination.sync="pagination"
+            hide-actions
+            item-key="id"
+            loading="true"
+            search="search"
+        > -->
+            <v-progress-linear slot="progress" color="blue" v-model="reorderingProgressPercentage"></v-progress-linear>
+            <template slot="items" slot-scope="props">
+                <td>{{props.item.track.name}}</td>
+                <td>{{millisToMinutesAndSeconds(props.item.track.duration_ms) || ''}}</td>
+                <td>{{displayArtists(props.item.track.artists) || ''}}</td>
+                <td>{{props.item.track.album.name || ''}}</td>
+                <td>{{getKey(props.item) || ''}}</td>
+                <td>{{getBpm(props.item) || ''}}</td>
+                <td>{{props.item.added_at || ''}}</td>
+            </template>
+        </v-data-table>
     </div>
 </template>
 
@@ -43,13 +47,57 @@ export default {
     data(){
         return {
             tracks: [],
-            showTracks: false,
-            tracksAreLoaded: false,
             tracksCopyForSorting: [],
-            index: 0
+            showTracks: false,
+            test: [],
+            tracksAreLoaded: false,
+            reorderingProgressPercentage: 0,
+            headers: [
+                {
+                    text: 'Name',
+                    align: 'left',
+                    value: 'track.name'
+                },
+                {
+                    text: 'Time',
+                    align: 'center',
+                    value: 'track.duration_ms'
+                },
+                {
+                    text: 'Artist',
+                    align: 'left',
+                    value: 'track.artist[0].name'
+                },
+                {
+                    text: 'Album',
+                    align: 'left',
+                    value: 'track.album.name'
+                },
+                {
+                    text: 'Key',
+                    align: 'center',
+                    value: 'features.key'
+                },
+                {
+                    text: 'BPM',
+                    align: 'center',
+                    value: 'features.tempo'
+                },
+                {
+                    text: 'Added',
+                    align: 'center',
+                    value: 'added_at'
+                },
+            ]
         }
     },
     methods:{
+        debug(){
+            let out = ''
+            this.tracks.forEach(track => out += track.track.name + ' ' )
+            console.log(out);
+            consolelog(test)
+        },
         getTracks(){
             if(!this.tracksAreLoaded) this.fetchTracks();
             this.showTracks = !this.showTracks;
@@ -95,7 +143,10 @@ export default {
             sortedTracks = sortedTracks || [...this.tracksCopyForSorting];
             pos = pos || 0;
             const originalIndex = this.tracks.findIndex(track => track === sortedTracks[pos]);
-            if(pos >= this.tracks.length) return;
+            if(pos >= this.tracks.length) {
+                this.reorderingProgressPercentage = 0;
+                return;
+            };
             if(pos === originalIndex) return this.reorder(sortedTracks, pos+1);
             axios.put(`https://api.spotify.com/v1/playlists/${this.playlist.id}/tracks`,
                 {
@@ -105,10 +156,12 @@ export default {
                 },
                 this.$store.getters.header)
                 .then(res => {
-                    console.log(`put song at index ${originalIndex} to index ${pos}`)
+                    console.log(`put song at index ${originalIndex} to index ${pos}`, ((pos + 1) / sortedTracks.length) * 100, sortedTracks.length)
+                    this.reorderingProgressPercentage = ((pos + 1) / sortedTracks.length) * 100;
                     this.tracks.splice(pos, 0, this.tracks.splice(originalIndex, 1)[0]);
                     this.playlist.snapshot_id = res.data.snapshot_id;
-                    if(pos < sortedTracks.length) this.reorder(sortedTracks, pos+1);
+                    if(pos < sortedTracks.length) return this.reorder(sortedTracks, pos+1);
+                    else this.reorderingProgressPercentage = 0;
                 })
                 .catch(err => this.handleError(err, () => this.reorder(sortedTracks, pos)));
         },
