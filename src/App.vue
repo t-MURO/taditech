@@ -8,36 +8,15 @@
     fixed
     app>
     <v-list dense>
-      <router-link to="new-releases">
-        <v-list-tile>
+        <v-list-tile v-for="link in links" :key="link.to" router :to="link.to">
           <v-list-tile-action>
-            <v-icon>new_releases</v-icon>
+            <v-icon>{{ link.icon }}</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>New Releases</v-list-tile-title>
+            <v-list-tile-title>{{ link.name }}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-      </router-link>
-      <router-link to="playlists">
-        <v-list-tile>
-          <v-list-tile-action>
-            <v-icon>library_music</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Playlists</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </router-link>
-      <router-link to="about">
-        <v-list-tile>
-          <v-list-tile-action>
-            <v-icon>info</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>About</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </router-link>
+
       <a href="/login">
         <v-list-tile>
           <v-list-tile-action>
@@ -83,7 +62,29 @@ export default {
       drawer: false,
       fixed: false,
       right: true,
-      title: 'Vuetify.js'
+      links: [
+        {
+          name: 'New Releases',
+          icon: 'new_releases',
+          to: 'new-releases'
+        },
+        {
+          name: 'Playlists',
+          icon: 'library_music',
+          to: 'playlists'
+        },
+        {
+          name: 'About',
+          icon: 'info',
+          to: 'about'
+        },
+        // {
+        //   name: 'Log Out',
+        //   icon: 'power_settings_new',
+        //   to: 'logout'
+        // },
+
+      ]
     }
   },
 };

@@ -1,8 +1,8 @@
 <template>
     <div>
         <h1>Welcome to Tadi Tech</h1>
-        <v-btn @click="redirectTo('new-releases')">New Releases</v-btn>
-        <v-btn @click="redirectTo('playlists')">Reorder Playlists</v-btn>        
+        <v-btn router to="new-releases">New Releases</v-btn>
+        <v-btn router to="playlists">Reorder Playlists</v-btn>        
     </div>
 </template>
 
@@ -19,10 +19,5 @@ export default {
             };
         }
     },
-    methods:{
-        redirectTo(page){
-            this.$router.push(page);
-        }
-    }
 }
 </script>
