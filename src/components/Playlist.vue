@@ -1,30 +1,27 @@
 <template>
     <div class="playlist-container">
-        <v-btn @click="sort()" @contextmenu="sort(true)">sort locally</v-btn> 
-        <v-btn @click="reorder()">reorder all</v-btn> 
-        <v-btn @click="debug()">debug</v-btn> 
         <div class="playlist" @click="getTracks()">
-            <img :src="playlist.images[0].url" alt="">
+            <img :src="playlist.images[0].url" :alt="playlist.name">
             <div class="metadata">
                 <h1>{{playlist.name}}</h1>
                 {{playlist.tracks.total}} songs
             </div>
+        <v-btn @click="reorder()">reorder all</v-btn> 
         </div>
         <v-data-table
             v-if="showTracks"
             :headers="headers"
             :items="tracks"
             :loading="reorderingProgressPercentage > 0"
-            v-model="test"
             class="elevation-1"
+            disable-initial-sort
+            no-data-text="Playlist is empty"
+            :rows-per-page-items="rowsPerPageItems"
+            ref="sorted-tracks"
             >
-            <!-- pagination.sync="pagination"
-            hide-actions
-            item-key="id"
-            loading="true"
-            search="search"
-        > -->
+
             <v-progress-linear slot="progress" color="blue" v-model="reorderingProgressPercentage"></v-progress-linear>
+
             <template slot="items" slot-scope="props">
                 <td>{{props.item.track.name}}</td>
                 <td>{{millisToMinutesAndSeconds(props.item.track.duration_ms) || ''}}</td>
@@ -34,6 +31,7 @@
                 <td>{{getBpm(props.item) || ''}}</td>
                 <td>{{props.item.added_at || ''}}</td>
             </template>
+
         </v-data-table>
     </div>
 </template>
@@ -47,9 +45,7 @@ export default {
     data(){
         return {
             tracks: [],
-            tracksCopyForSorting: [],
             showTracks: false,
-            test: [],
             tracksAreLoaded: false,
             reorderingProgressPercentage: 0,
             headers: [
@@ -66,7 +62,7 @@ export default {
                 {
                     text: 'Artist',
                     align: 'left',
-                    value: 'track.artist[0].name'
+                    value: 'track.artists[0].name'
                 },
                 {
                     text: 'Album',
@@ -88,16 +84,11 @@ export default {
                     align: 'center',
                     value: 'added_at'
                 },
-            ]
+            ],
+            rowsPerPageItems: [ 20, 50, { "text": "$vuetify.dataIterator.rowsPerPageAll", "value": -1 } ]
         }
     },
     methods:{
-        debug(){
-            let out = ''
-            this.tracks.forEach(track => out += track.track.name + ' ' )
-            console.log(out);
-            consolelog(test)
-        },
         getTracks(){
             if(!this.tracksAreLoaded) this.fetchTracks();
             this.showTracks = !this.showTracks;
@@ -140,7 +131,7 @@ export default {
             return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
         },
         reorder(sortedTracks, pos){
-            sortedTracks = sortedTracks || [...this.tracksCopyForSorting];
+            sortedTracks = sortedTracks || [...this.$refs['sorted-tracks'].filteredItems];
             pos = pos || 0;
             const originalIndex = this.tracks.findIndex(track => track === sortedTracks[pos]);
             if(pos >= this.tracks.length) {
@@ -165,16 +156,6 @@ export default {
                 })
                 .catch(err => this.handleError(err, () => this.reorder(sortedTracks, pos)));
         },
-        sort(bool){
-            if(bool) this.tracksCopyForSorting.sort((a,b) => a.added_at < b.added_at ? -1 : 1);
-            else this.tracksCopyForSorting.sort((a,b) => a.added_at > b.added_at ? -1 : 1);
-            let test1 = '';
-            let test2 = '';
-            this.tracksCopyForSorting.forEach(track => test1 += track.track.name + ' | ')
-            this.tracks.forEach(track => test2 += track.track.name + ' | ')
-            console.log(test1)
-            console.log(test2)
-        },
         getBpm(track){
             return track.features ? Math.round(track.features.tempo) : '';
         },
@@ -198,11 +179,6 @@ export default {
             }
         }
     },
-    watch:{
-        tracks: function() {
-            this.tracksCopyForSorting = [...this.tracks];
-        }
-    }
 }
 </script>
 
@@ -234,25 +210,4 @@ export default {
 .playlist .metadata{
     margin-left: 1em;
 }
-
-table{
-    width: 100%;
-    padding: 1em;
-}
-
-td{
-    padding: .5em;
-    border-bottom: solid black 1px;
-}
-
-th:hover{
-    cursor: pointer;
-    background-color: rgba(255, 255, 255, .3);
-}
-
-tr:hover{
-    cursor: pointer;
-    background-color: rgba(255, 255, 255, .3);
-}
-
 </style>
