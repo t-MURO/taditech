@@ -1,7 +1,7 @@
 <template>
     <div class="playlist-container">
-        <div class="playlist" @click="getTracks()">
-            <img :src="playlist.images[0].url" :alt="playlist.name">
+        <div class="playlist">
+            <img @click="getTracks()" :src="playlist.images[0].url" :alt="playlist.name">
             <div class="metadata">
                 <h1>{{playlist.name}}</h1>
                 {{playlist.tracks.total}} songs
@@ -133,12 +133,19 @@ export default {
         reorder(sortedTracks, pos){
             sortedTracks = sortedTracks || [...this.$refs['sorted-tracks'].filteredItems];
             pos = pos || 0;
-            const originalIndex = this.tracks.findIndex(track => track === sortedTracks[pos]);
+
+            // recursion ending condition
             if(pos >= this.tracks.length) {
                 this.reorderingProgressPercentage = 0;
                 return;
             };
+
+            // find the position of the sorted track in original order
+            const originalIndex = this.tracks.findIndex(track => track.track.id === sortedTracks[pos].track.id && track.added_at === sortedTracks[pos].added_at);
+
+            // if both values are equal the song is already in the correct position
             if(pos === originalIndex) return this.reorder(sortedTracks, pos+1);
+
             axios.put(`https://api.spotify.com/v1/playlists/${this.playlist.id}/tracks`,
                 {
                     range_start: originalIndex,
@@ -147,9 +154,13 @@ export default {
                 },
                 this.$store.getters.header)
                 .then(res => {
-                    console.log(`put song at index ${originalIndex} to index ${pos}`, ((pos + 1) / sortedTracks.length) * 100, sortedTracks.length)
+                    console.log(`put song at index ${originalIndex} to index ${pos}`, ((pos + 1) / sortedTracks.length) * 100, sortedTracks.length);
+
                     this.reorderingProgressPercentage = ((pos + 1) / sortedTracks.length) * 100;
+
+                    // apply reorder locally to keep track of the changing positions for the next reorder step
                     this.tracks.splice(pos, 0, this.tracks.splice(originalIndex, 1)[0]);
+
                     this.playlist.snapshot_id = res.data.snapshot_id;
                     if(pos < sortedTracks.length) return this.reorder(sortedTracks, pos+1);
                     else this.reorderingProgressPercentage = 0;
