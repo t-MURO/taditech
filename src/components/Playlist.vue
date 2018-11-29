@@ -85,7 +85,7 @@ export default {
                     value: 'added_at'
                 },
             ],
-            rowsPerPageItems: [ 20, 50, { "text": "$vuetify.dataIterator.rowsPerPageAll", "value": -1 } ]
+            rowsPerPageItems: [{ "text": "$vuetify.dataIterator.rowsPerPageAll", "value": -1 } ]
         }
     },
     methods:{
@@ -162,8 +162,7 @@ export default {
                     this.tracks.splice(pos, 0, this.tracks.splice(originalIndex, 1)[0]);
 
                     this.playlist.snapshot_id = res.data.snapshot_id;
-                    if(pos < sortedTracks.length) return this.reorder(sortedTracks, pos+1);
-                    else this.reorderingProgressPercentage = 0;
+                    return this.reorder(sortedTracks, pos);
                 })
                 .catch(err => this.handleError(err, () => this.reorder(sortedTracks, pos)));
         },
