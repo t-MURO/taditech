@@ -2,7 +2,7 @@
 <div>
     <div v-if="loading">
       <h2>Loading data from Spotify</h2>
-      <v-progress-linear :indeterminate="loading"></v-progress-linear>
+      <v-progress-linear :value="loadingProgress"></v-progress-linear>
     </div>
       <album-tiles-container :albums="albums">
       </album-tiles-container>
@@ -102,6 +102,9 @@ export default {
   computed: {
     albums: function(){
       return this.$store.getters.albums;
+    },
+    loadingProgress: function(){
+      return (this.artistsCounterSingle + this.artistsCounterAlbum) / ((this.artists.length || 1) * 2) * 100; // or operator fixes initial full loading bar
     }
   }
 }
