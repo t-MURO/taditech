@@ -7,7 +7,7 @@
                 {{playlist.tracks.total}} songs
             </div>
             <v-spacer></v-spacer>
-            <v-btn @click="reorder()">reorder</v-btn> 
+            <v-btn v-if="showTracks" @click="reorder()">reorder</v-btn> 
         </div>
         <v-data-table
             v-if="showTracks"
@@ -25,12 +25,12 @@
 
             <template slot="items" slot-scope="props">
                 <td>{{props.item.track.name}}</td>
-                <td>{{millisToMinutesAndSeconds(props.item.track.duration_ms) || ''}}</td>
+                <td class="text-xs-right">{{millisToMinutesAndSeconds(props.item.track.duration_ms) || ''}}</td>
                 <td>{{displayArtists(props.item.track.artists) || ''}}</td>
                 <td>{{props.item.track.album.name || ''}}</td>
-                <td>{{getKey(props.item) || ''}}</td>
-                <td>{{getBpm(props.item) || ''}}</td>
-                <td>{{props.item.added_at || ''}}</td>
+                <td class="text-xs-right">{{getKey(props.item)}}</td>
+                <td class="text-xs-right">{{getBpm(props.item)}}</td>
+                <td class="text-xs-right">{{props.item.added_at || ''}}</td>
             </template>
 
         </v-data-table>
@@ -168,10 +168,10 @@ export default {
                 .catch(err => this.handleError(err, () => this.reorder(sortedTracks, pos)));
         },
         getBpm(track){
-            return track.features ? Math.round(track.features.tempo) : '';
+            return track.features ? Math.round(track.features.tempo) : null;
         },
         getKey(track){
-            return track.features ? this.getKeyValue(track.features.key) : '';
+            return track.features ? `(${track.features.key})  ${this.getKeyValue(track.features.key)}` : null;
         },
         getKeyValue(key){
             switch(key){
