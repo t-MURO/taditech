@@ -6,7 +6,8 @@
                 <h1>{{playlist.name}}</h1>
                 {{playlist.tracks.total}} songs
             </div>
-        <v-btn @click="reorder()">reorder all</v-btn> 
+            <v-spacer></v-spacer>
+            <v-btn @click="reorder()">reorder</v-btn> 
         </div>
         <v-data-table
             v-if="showTracks"
@@ -126,8 +127,8 @@ export default {
             window.open(uri, '_parent')
         },
         millisToMinutesAndSeconds(millis) {
-            let minutes = Math.floor(millis / 60000);
-            let seconds = ((millis % 60000) / 1000).toFixed(0);
+            const minutes = Math.floor(millis / 60000);
+            const seconds = ((millis % 60000) / 1000).toFixed(0);
             return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
         },
         reorder(sortedTracks, pos){

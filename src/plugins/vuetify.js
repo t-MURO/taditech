@@ -11,6 +11,9 @@ import {
   VToolbar,
   VProgressLinear,
   VDataTable,
+  VCard,
+  VTextField,
+  VAlert,
   transitions
 } from 'vuetify'
 import 'vuetify/src/stylus/app.styl'
@@ -27,6 +30,9 @@ Vue.use(Vuetify, {
     VToolbar,
     VProgressLinear,
     VDataTable,
+    VCard,
+    VTextField,
+    VAlert,
     transitions
   },
   theme: {
