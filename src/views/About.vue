@@ -3,7 +3,12 @@
 
 <v-card>
     <v-card-title class="text-xs-center">
-      Nutrition
+        <img class="cover-img" src="https://mosaic.scdn.co/640/110eb199dc430c07cb25b8bf39e248c4b6bd225631a41ba7a582a576b5de2e2d50c8d3c1740ed399c2284091de1348f71ebe98e92458a4fad64145e1ecbc71f031d40de0c941e33a661e3aca1b342255" alt="" srcset="">
+
+      <div class="title-container">
+        <h1>Tadi Tech</h1>
+        <p>207 Songs</p>
+      </div>
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -194,6 +199,16 @@
 <style scoped>
 .v-input{
   margin-top: 0;
+}
+
+.cover-img{
+  height: 12em;
+  width: 12em;
+}
+
+.title-container{
+  margin: 2em;
+  text-align: left;
 }
 
 .upside-down{

@@ -3,7 +3,6 @@
         <h1 @click="showDateGroup = !showDateGroup">{{dateToYearAndMonth(albums[0]) | formatDate}}</h1>
         <album-tile v-if="showDateGroup" v-for="album in albums" :key="album.id" :album="album">
         </album-tile>
-        <hr v-if="!showDateGroup">
     </div>
 </template>
 
@@ -57,11 +56,6 @@ h1, hr{
     grid-column: 1/-1;
     cursor: pointer;
 }
-
-hr{
-    margin-bottom: 2em;
-}
-
 
 @media screen and (max-width: 870px) {
     .custom-grid{

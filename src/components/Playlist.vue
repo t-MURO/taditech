@@ -1,14 +1,36 @@
 <template>
-    <div class="playlist-container">
-        <div class="playlist">
-            <img @click="getTracks()" :src="playlist.images[0].url" :alt="playlist.name">
-            <div class="metadata">
-                <h1>{{playlist.name}}</h1>
-                {{playlist.tracks.total}} songs
-            </div>
-            <v-spacer></v-spacer>
-            <v-btn v-if="showTracks" @click="reorder()">reorder</v-btn> 
-        </div>
+<v-card class="playlist-container">
+    <v-card-title class="text-xs-center">
+    <img @click="expand()" class="cover-img" :src="playlist.images[0].url" :alt="playlist.name">
+
+    <div class="title-container">
+        <h1>{{ playlist.name }}</h1>
+        <p>{{ playlist.tracks.total }} Songs</p>
+    </div>
+    <v-spacer></v-spacer>
+    <v-text-field
+        v-model="search"
+        append-icon="search"
+        label="Search"
+        single-line
+        hide-details
+    ></v-text-field>
+
+    <!-- <v-btn color="success">text</v-btn> -->
+    <v-btn icon @click="fetchTracks(null, true)">
+        <v-icon>refresh</v-icon>
+    </v-btn>
+    <v-btn flat>
+        <v-icon left>sort_by_alpha</v-icon>
+        filters
+    </v-btn>
+    <v-btn outline @click="reorder()">
+        <v-icon left class="upside-down">low_priority</v-icon>
+        reorder
+    </v-btn>
+    
+
+    </v-card-title>
         <v-data-table
             v-if="showTracks"
             :headers="headers"
@@ -17,6 +39,7 @@
             class="elevation-1"
             disable-initial-sort
             no-data-text="Playlist is empty"
+            :search="search"
             :rows-per-page-items="rowsPerPageItems"
             ref="sorted-tracks"
             >
@@ -24,17 +47,17 @@
             <v-progress-linear slot="progress" color="blue" v-model="reorderingProgressPercentage"></v-progress-linear>
 
             <template slot="items" slot-scope="props">
-                <td>{{props.item.track.name}}</td>
-                <td class="text-xs-right">{{millisToMinutesAndSeconds(props.item.track.duration_ms) || ''}}</td>
-                <td>{{displayArtists(props.item.track.artists) || ''}}</td>
-                <td>{{props.item.track.album.name || ''}}</td>
-                <td class="text-xs-right">{{getKey(props.item)}}</td>
-                <td class="text-xs-right">{{getBpm(props.item)}}</td>
-                <td class="text-xs-right">{{props.item.added_at || ''}}</td>
+                <td>{{ props.item.track.name }}</td>
+                <td class="text-xs-right">{{ millisToMinutesAndSeconds(props.item.track.duration_ms) || '' }}</td>
+                <td>{{ props.item.dataTableData ? props.item.dataTableData.artists : '' }}</td>
+                <td>{{ props.item.track.album.name || '' }}</td>
+                <td class="text-xs-right">{{ getKey(props.item) }}</td>
+                <td class="text-xs-right">{{ getBpm(props.item) }}</td>
+                <td class="text-xs-right">{{ props.item.added_at || '' }}</td>
             </template>
 
         </v-data-table>
-    </div>
+</v-card>
 </template>
 
 <script>
@@ -49,6 +72,7 @@ export default {
             showTracks: false,
             tracksAreLoaded: false,
             reorderingProgressPercentage: 0,
+            search: '',
             headers: [
                 {
                     text: 'Name',
@@ -63,7 +87,7 @@ export default {
                 {
                     text: 'Artist',
                     align: 'left',
-                    value: 'track.artists[0].name'
+                    value: 'dataTableData.artists'
                 },
                 {
                     text: 'Album',
@@ -90,11 +114,15 @@ export default {
         }
     },
     methods:{
-        getTracks(){
+        expand(){
             if(!this.tracksAreLoaded) this.fetchTracks();
             this.showTracks = !this.showTracks;
         },
-        fetchTracks(href){
+        fetchTracks(href, refresh){
+            if(refresh) {
+                this.tracksAreLoaded = false;
+                this.tracks = [];
+            }
             const url = href || `https://api.spotify.com/v1/playlists/${this.playlist.id}/tracks`;
             axios.get(url, this.$store.getters.header)
                 .then(res => {
@@ -112,7 +140,12 @@ export default {
                 .then(res => {
                     res.data.audio_features.forEach( tracksAudioFeatures => {
                         const index = this.tracks.findIndex(track => track.track.id === tracksAudioFeatures.id);
-                        this.tracks[index].features = tracksAudioFeatures;
+                        let currentTrack = this.tracks[index];
+                        currentTrack.features = tracksAudioFeatures;
+                        currentTrack.dataTableData = {
+                            artists: this.displayArtists(currentTrack.track.artists),
+
+                        }
                     });
                     this.$forceUpdate();
                 })
@@ -218,7 +251,32 @@ export default {
     width: 8em;
 }
 
+/* img{
+    object-fit: cover;
+    height: 8em;
+    width: 8em;
+} */
+
 .playlist .metadata{
     margin-left: 1em;
+}
+
+.v-input{
+  margin-top: 0;
+}
+
+.cover-img{
+  height: 12em;
+  width: 12em;
+}
+
+.title-container{
+  margin: 2em;
+  text-align: left;
+  max-width: 40em;;
+}
+
+.upside-down{
+  transform: rotateX(180deg);
 }
 </style>
