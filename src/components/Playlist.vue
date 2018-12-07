@@ -2,7 +2,7 @@
 <v-card class="playlist-container">
     <v-card-title>
         <img @click="expand()" class="cover-img" :src="playlist.images[0].url" :alt="playlist.name">
-        <div class="title-container">
+        <div @click="expand()" class="title-container">
             <h1>{{ playlist.name }}</h1>
             <p>{{ playlist.tracks.total }} Songs</p>
         </div>
@@ -271,12 +271,14 @@ export default {
 .cover-img{
   height: 12em;
   width: 12em;
+  cursor: pointer;
 }
 
 .title-container{
   margin: 2em;
   text-align: left;
   max-width: 40em;;
+  cursor: pointer;
 }
 
 .upside-down{
