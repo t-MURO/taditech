@@ -7,7 +7,7 @@
     </div>
     <div class="album-info">
       <div class="album-title">{{album.name}}</div>
-      <div class="artist">{{album.artists[0].name}}</div>
+      <div class="artist">{{album.artists | formatArtistsNames }}</div>
       <div class="release-date">{{album.release_date | formatDate}}</div>
     </div>
   </a>
@@ -46,6 +46,9 @@ export default {
             case 11: return `${day} December ${year}`
         }
 
+    },
+    formatArtistsNames(artists){
+      return artists.map(artist => ` ${artist.name}`).toString().trim();
     }
   }
 };
