@@ -42,3 +42,9 @@ export default {
     }
 }
 </script>
+
+<style>
+h1{
+    margin-bottom: 1em;
+}
+</style>

@@ -1,41 +1,39 @@
 <template>
 <v-card class="playlist-container">
-    <v-card-title class="text-xs-center">
-    <img @click="expand()" class="cover-img" :src="playlist.images[0].url" :alt="playlist.name">
+    <v-card-title>
+        <img @click="expand()" class="cover-img" :src="playlist.images[0].url" :alt="playlist.name">
+        <div class="title-container">
+            <h1>{{ playlist.name }}</h1>
+            <p>{{ playlist.tracks.total }} Songs</p>
+        </div>
+        <v-spacer></v-spacer>
 
-    <div class="title-container">
-        <h1>{{ playlist.name }}</h1>
-        <p>{{ playlist.tracks.total }} Songs</p>
-    </div>
-    <v-spacer></v-spacer>
-    <v-text-field
-        v-model="search"
-        append-icon="search"
-        label="Search"
-        single-line
-        hide-details
-    ></v-text-field>
+        <v-text-field
+            v-model="search"
+            append-icon="search"
+            label="Search"
+            single-line
+            hide-details
+        ></v-text-field>
 
-    <!-- <v-btn color="success">text</v-btn> -->
-    <v-btn icon @click="fetchTracks(null, true)">
-        <v-icon>refresh</v-icon>
-    </v-btn>
-    <v-btn flat>
-        <v-icon left>sort_by_alpha</v-icon>
-        filters
-    </v-btn>
-    <v-btn outline @click="reorder()">
-        <v-icon left class="upside-down">low_priority</v-icon>
-        reorder
-    </v-btn>
-    
+        <v-btn icon @click="fetchTracks(null, true)">
+            <v-icon>refresh</v-icon>
+        </v-btn>
+        <!-- <v-btn flat>
+            <v-icon left>sort_by_alpha</v-icon>
+            filters
+        </v-btn> -->
+        <v-btn outline :disabled="search.length > 0" @click="reorder()">
+            <v-icon left class="upside-down">low_priority</v-icon>
+            reorder
+        </v-btn>
 
     </v-card-title>
         <v-data-table
             v-if="showTracks"
             :headers="headers"
             :items="tracks"
-            :loading="reorderingProgressPercentage > 0"
+            :loading="reorderingProgressPercentage > 0 || !tracksAreLoaded"
             class="elevation-1"
             disable-initial-sort
             no-data-text="Playlist is empty"
@@ -44,7 +42,7 @@
             ref="sorted-tracks"
             >
 
-            <v-progress-linear slot="progress" color="blue" v-model="reorderingProgressPercentage"></v-progress-linear>
+            <v-progress-linear slot="progress" color="blue" v-model="reorderingProgressPercentage" :indeterminate="!tracksAreLoaded"></v-progress-linear>
 
             <template slot="items" slot-scope="props">
                 <td>{{ props.item.track.name }}</td>
@@ -54,6 +52,7 @@
                 <td class="text-xs-right">{{ getKey(props.item) }}</td>
                 <td class="text-xs-right">{{ getBpm(props.item) }}</td>
                 <td class="text-xs-right">{{ props.item.added_at || '' }}</td>
+                <td class="text-xs-right">{{ props.item.track.popularity }}</td>
             </template>
 
         </v-data-table>
@@ -109,6 +108,11 @@ export default {
                     align: 'center',
                     value: 'added_at'
                 },
+                {
+                    text: 'Popularity',
+                    align: 'center',
+                    value: 'track.popularity'
+                }
             ],
             rowsPerPageItems: [{ "text": "$vuetify.dataIterator.rowsPerPageAll", "value": -1 } ]
         }
@@ -232,6 +236,10 @@ export default {
     margin-bottom: 1.75em;
 }
 
+.playlist-container .v-text-field{
+    max-width: 12em;
+}
+
 .playlist-container:hover{
     box-shadow: 0 0 30px rgba(255,255,255,0.25), 0 0 30px rgba(255,255,255,0.22);
 }
@@ -251,11 +259,6 @@ export default {
     width: 8em;
 }
 
-/* img{
-    object-fit: cover;
-    height: 8em;
-    width: 8em;
-} */
 
 .playlist .metadata{
     margin-left: 1em;
