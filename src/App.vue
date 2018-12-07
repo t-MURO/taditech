@@ -73,11 +73,6 @@ export default {
           icon: 'library_music',
           to: 'playlists'
         },
-        {
-          name: 'About',
-          icon: 'info',
-          to: 'about'
-        },
         // {
         //   name: 'Log Out',
         //   icon: 'power_settings_new',
