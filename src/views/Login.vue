@@ -2,7 +2,7 @@
     <div>
         <h1>Login with your Spotify account</h1>
         <a :href="authUrl">
-            <v-btn>Login</v-btn>
+            <v-btn>Log in</v-btn>
         </a>
     </div>
 </template>
