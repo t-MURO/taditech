@@ -154,7 +154,7 @@ export default {
                 popularity: {
                     text: 'Popularity',
                     align: 'center',
-                    value: 'features.popularity'
+                    value: 'track.popularity'
                 },
                 acousticness: {
                     text: 'Acousticness',
