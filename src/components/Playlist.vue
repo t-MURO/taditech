@@ -73,7 +73,6 @@
                 <td class="text-xs-right">{{ props.item | getBpm }}</td>
                 <td class="text-xs-right">{{ props.item.added_at || '' }}</td>
                 <td class="text-xs-right">{{ getLastHeaderData(props.item) }}</td>
-                <td></td>
             </template>
 
         </v-data-table>
