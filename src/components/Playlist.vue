@@ -1,8 +1,8 @@
 <template>
-<v-card class="playlist-container">
+<v-card class="playlist-container elevation-10">
     <v-card-title>
         <img @click="expand()" class="cover-img" :src="playlist.images[0].url" :alt="playlist.name">
-        <div class="title-container">
+        <div @click="expand()" class="title-container">
             <h1>{{ playlist.name }}</h1>
             <p>{{ playlist.tracks.total }} Songs</p>
         </div>
@@ -19,11 +19,29 @@
         <v-btn icon @click="fetchTracks(null, true)">
             <v-icon>refresh</v-icon>
         </v-btn>
-        <!-- <v-btn flat>
-            <v-icon left>sort_by_alpha</v-icon>
-            filters
-        </v-btn> -->
-        <v-btn outline :disabled="search.length > 0" @click="reorder()">
+
+        <v-menu open-on-hover bottom offset-y>
+            <v-btn
+                slot="activator"
+                flat
+            >
+                <v-icon left>sort_by_alpha</v-icon>
+                filters
+            </v-btn>
+
+            <v-list>
+                <v-list-tile
+                v-for="(header, index) in extraHeaders"
+                :key="index"
+                @click="replaceLastHeader(header)"
+                >
+                <v-list-tile-title>{{ header.text }}</v-list-tile-title>
+                </v-list-tile>
+            </v-list>
+        </v-menu>
+
+        <v-btn flat @click="shuffle()"><v-icon left>shuffle</v-icon>shuffle</v-btn>
+        <v-btn outline :disabled="!showTracks || search.length > 0" @click="reorder()">
             <v-icon left class="upside-down">low_priority</v-icon>
             reorder
         </v-btn>
@@ -39,20 +57,23 @@
             no-data-text="Playlist is empty"
             :search="search"
             :rows-per-page-items="rowsPerPageItems"
+            :pagination.sync="pagination"
             ref="sorted-tracks"
             >
 
             <v-progress-linear slot="progress" color="blue" v-model="reorderingProgressPercentage" :indeterminate="!tracksAreLoaded"></v-progress-linear>
 
             <template slot="items" slot-scope="props">
+                <td class="text-xs-right" value="index">{{ props.index + 1 }}</td>
                 <td>{{ props.item.track.name }}</td>
                 <td class="text-xs-right">{{ millisToMinutesAndSeconds(props.item.track.duration_ms) || '' }}</td>
                 <td>{{ props.item.dataTableData ? props.item.dataTableData.artists : '' }}</td>
                 <td>{{ props.item.track.album.name || '' }}</td>
-                <td class="text-xs-right">{{ getKey(props.item) }}</td>
-                <td class="text-xs-right">{{ getBpm(props.item) }}</td>
+                <td class="text-xs-right">{{ props.item | getKeyValue }}</td>
+                <td class="text-xs-right">{{ props.item | getBpm }}</td>
                 <td class="text-xs-right">{{ props.item.added_at || '' }}</td>
-                <td class="text-xs-right">{{ props.item.track.popularity }}</td>
+                <td class="text-xs-right">{{ getLastHeaderData(props.item) }}</td>
+                <td></td>
             </template>
 
         </v-data-table>
@@ -72,7 +93,16 @@ export default {
             tracksAreLoaded: false,
             reorderingProgressPercentage: 0,
             search: '',
+            pagination: {
+                sortBy: 'index'
+            },
             headers: [
+                {
+                    text: '#',
+                    align: 'right',
+                    value: 'index',
+                    sortable: false
+                },
                 {
                     text: 'Name',
                     align: 'left',
@@ -112,8 +142,61 @@ export default {
                     text: 'Popularity',
                     align: 'center',
                     value: 'track.popularity'
-                }
+                },
+
             ],
+            extraHeaders: {
+                releaseDate: {
+                    text: 'Release Date',
+                    align: 'center',
+                    value: 'track.album.release_date'
+                },
+                popularity: {
+                    text: 'Popularity',
+                    align: 'center',
+                    value: 'features.popularity'
+                },
+                acousticness: {
+                    text: 'Acousticness',
+                    align: 'center',
+                    value: 'features.acousticness'
+                },
+                danceability: {
+                    text: 'Danceability',
+                    align: 'center',
+                    value: 'features.danceability'
+                },
+                energy: {
+                    text: 'Energy',
+                    align: 'center',
+                    value: 'features.energy'
+                },
+                instrumentalness: {
+                    text: 'Instrumentalness',
+                    align: 'center',
+                    value: 'features.instrumentalness'
+                },
+                liveness: {
+                    text: 'Liveness',
+                    align: 'center',
+                    value: 'features.liveness'
+                },
+                loudness: {
+                    text: 'Loudness',
+                    align: 'center',
+                    value: 'features.loudness'
+                },
+                speechiness: {
+                    text: 'Speechiness',
+                    align: 'center',
+                    value: 'features.speechiness'
+                },
+                valence: {
+                    text: 'Valence',
+                    align: 'center',
+                    value: 'features.valence'
+                },
+            },
             rowsPerPageItems: [{ "text": "$vuetify.dataIterator.rowsPerPageAll", "value": -1 } ]
         }
     },
@@ -121,6 +204,17 @@ export default {
         expand(){
             if(!this.tracksAreLoaded) this.fetchTracks();
             this.showTracks = !this.showTracks;
+        },
+        getLastHeaderData(item){
+            const header = this.headers[this.headers.length - 1];
+            const objKeys = header.value.split('.');
+            if(objKeys.length === 1) return item[objKeys[0]];
+            let output = {...item}
+            if(!output) return '';
+            objKeys.forEach(key => {
+                output = output[key];
+            });
+            return output;
         },
         fetchTracks(href, refresh){
             if(refresh) {
@@ -204,29 +298,42 @@ export default {
                 })
                 .catch(err => this.handleError(err, () => this.reorder(sortedTracks, pos)));
         },
+        shuffle(){
+            this.tracks.sort(() => .5 - Math.random());
+            this.resetSort();
+        },
+        resetSort(){
+            this.pagination.sortBy = "index"
+            this.pagination.descending = true;
+        },
+        replaceLastHeader(header){
+            this.headers[this.headers.length - 1] = header;
+            this.$forceUpdate();
+        }
+    },
+    filters: {
         getBpm(track){
             return track.features ? Math.round(track.features.tempo) : null;
         },
-        getKey(track){
-            return track.features ? `(${track.features.key})  ${this.getKeyValue(track.features.key)}` : null;
-        },
-        getKeyValue(key){
+        getKeyValue(track){
+            if(!track.features) return;
+            const key = track.features.key
             switch(key){
-                case 0: return 'C'
-                case 1: return 'C#/Db'
-                case 2: return 'D'
-                case 3: return 'D#/Eb'
-                case 4: return 'E'
-                case 5: return 'F'
-                case 6: return 'F#/Gb'
-                case 7: return 'G'
-                case 8: return 'G#/Ab'
-                case 9: return 'A'
-                case 10: return 'A#/Ab'
-                case 11: return 'B'
+                case 0: return `(${key}) C`
+                case 1: return `(${key}) C#/Db`
+                case 2: return `(${key}) D`
+                case 3: return `(${key}) D#/Eb`
+                case 4: return `(${key}) E`
+                case 5: return `(${key}) F`
+                case 6: return `(${key}) F#/Gb`
+                case 7: return `(${key}) G`
+                case 8: return `(${key}) G#/Ab`
+                case 9: return `(${key}) A`
+                case 10: return `(${key}) A#/Ab`
+                case 11: return `(${key}) B`
             }
         }
-    },
+    }
 }
 </script>
 
@@ -240,10 +347,6 @@ export default {
     max-width: 12em;
 }
 
-.playlist-container:hover{
-    box-shadow: 0 0 30px rgba(255,255,255,0.25), 0 0 30px rgba(255,255,255,0.22);
-}
-
 .playlist{
     display: flex;
     width: 100%;
@@ -252,13 +355,6 @@ export default {
 .playlist:hover{
     cursor: pointer;
 }
-
-.playlist img{
-    object-fit: cover;
-    height: 8em;
-    width: 8em;
-}
-
 
 .playlist .metadata{
     margin-left: 1em;
@@ -269,14 +365,17 @@ export default {
 }
 
 .cover-img{
+  object-fit: cover;
   height: 12em;
   width: 12em;
+  cursor: pointer;
 }
 
 .title-container{
   margin: 2em;
   text-align: left;
   max-width: 40em;;
+  cursor: pointer;
 }
 
 .upside-down{
