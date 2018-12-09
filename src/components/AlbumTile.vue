@@ -1,5 +1,5 @@
 <template>
-  <a :href="'spotify:album:'+album.id" class="tile" @click="debugging()">
+  <a :href="'spotify:album:'+album.id" class="tile elevation-10" @click="debugging()">
     <div class="img-container">
       <div>
         <img :src="album.images[0].url">
@@ -63,8 +63,7 @@ export default {
   padding-bottom: 1em;
 }
 .tile:hover{
-  /* cursor: pointer; */
-  box-shadow: 0 0 30px rgba(255,255,255,0.25), 0 0 30px rgba(255,255,255,0.22);
+  background-color: rgba(255,255,255,0.1);
 }
 
 .img-container{
