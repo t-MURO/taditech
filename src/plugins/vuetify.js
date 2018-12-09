@@ -14,6 +14,7 @@ import {
   VCard,
   VTextField,
   VAlert,
+  VMenu,
   transitions
 } from 'vuetify'
 import 'vuetify/src/stylus/app.styl'
@@ -33,6 +34,7 @@ Vue.use(Vuetify, {
     VCard,
     VTextField,
     VAlert,
+    VMenu,
     transitions
   },
   theme: {
