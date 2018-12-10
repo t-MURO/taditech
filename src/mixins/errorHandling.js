@@ -5,7 +5,7 @@ export default {
 
             if(err.response && err.response.status){
 
-                if(err.response.status === 429){
+                if(err.response.status === 429 || err.response.status === 502){
                     setTimeout(() => {
                         cb();
                     }, parseInt(err.response.headers['retry-after']) * 1000);
