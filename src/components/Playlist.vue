@@ -298,8 +298,9 @@ export default {
                 .catch(err => this.handleError(err, () => this.reorder(sortedTracks, pos)));
         },
         shuffle(){
-            this.tracks.sort(() => .5 - Math.random());
             this.resetSort();
+            this.$refs['sorted-tracks'].filteredItems.sort(() => .5 - Math.random());
+            this.$forceUpdate();
         },
         resetSort(){
             this.pagination.sortBy = "index"
