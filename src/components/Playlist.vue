@@ -41,9 +41,15 @@
         </v-menu>
 
         <v-btn flat @click="shuffle()"><v-icon left>shuffle</v-icon>shuffle</v-btn>
-        <v-btn outline :disabled="!showTracks || search.length > 0" @click="reorder()">
+
+        <v-btn outline v-if="reorderingProgressPercentage === 0" :disabled="!showTracks || search.length > 0" @click="reorder()">
             <v-icon left class="upside-down">low_priority</v-icon>
             reorder
+        </v-btn>
+
+        <v-btn outline v-if="reorderingProgressPercentage > 0" :disabled="!showTracks || search.length > 0" @click="cancelReorder = true">
+            <v-icon left class="upside-down">cancel</v-icon>
+            cancel
         </v-btn>
 
     </v-card-title>
@@ -65,13 +71,13 @@
 
             <template slot="items" slot-scope="props">
                 <td class="text-xs-right" value="index">{{ props.index + 1 }}</td>
-                <td>{{ props.item.track.name }}</td>
-                <td class="text-xs-right">{{ millisToMinutesAndSeconds(props.item.track.duration_ms) || '' }}</td>
-                <td>{{ props.item.dataTableData ? props.item.dataTableData.artists : '' }}</td>
-                <td>{{ props.item.track.album.name || '' }}</td>
+                <td>{{ props.item.track.name || 'N/A' }}</td>
+                <td class="text-xs-right">{{ millisToMinutesAndSeconds(props.item.track.duration_ms) || 'N/A' }}</td>
+                <td>{{ props.item.dataTableData ? props.item.dataTableData.artists : 'N/A' }}</td>
+                <td>{{ props.item.track.album.name || 'N/A' }}</td>
                 <td class="text-xs-right">{{ props.item | getKeyValue }}</td>
                 <td class="text-xs-right">{{ props.item | getBpm }}</td>
-                <td class="text-xs-right">{{ props.item.added_at || '' }}</td>
+                <td class="text-xs-right">{{ props.item.added_at || 'N/A' }}</td>
                 <td class="text-xs-right">{{ getLastHeaderData(props.item) }}</td>
             </template>
 
@@ -91,6 +97,8 @@ export default {
             showTracks: false,
             tracksAreLoaded: false,
             reorderingProgressPercentage: 0,
+            cancelReorder: false,
+            sortedTracks: null,
             search: '',
             pagination: {
                 sortBy: 'index'
@@ -209,11 +217,11 @@ export default {
             const objKeys = header.value.split('.');
             if(objKeys.length === 1) return item[objKeys[0]];
             let output = {...item}
-            if(!output) return '';
             objKeys.forEach(key => {
+                if(!output) return 'N/A';
                 output = output[key];
             });
-            return output;
+            return output || 'N/A';
         },
         fetchTracks(href, refresh){
             if(refresh) {
@@ -262,7 +270,16 @@ export default {
             return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
         },
         reorder(sortedTracks, pos){
-            sortedTracks = sortedTracks || [...this.$refs['sorted-tracks'].filteredItems];
+            
+            if(this.cancelReorder){
+                this.cancelReorder = false;
+                this.reorderingProgressPercentage = 0;
+                return;
+            }
+
+            // this makes sure a you can continue reordering after cancelling (important for shuffled sorting)
+            this.sortedTracks = this.sortedTracks || [...this.$refs['sorted-tracks'].filteredItems];
+            sortedTracks = sortedTracks || [...this.sortedTracks];
             pos = pos || 0;
 
             // recursion ending condition
@@ -274,6 +291,7 @@ export default {
             // find the position of the sorted track in original order
             const originalIndex = this.tracks.findIndex(track => track.track.id === sortedTracks[pos].track.id && track.added_at === sortedTracks[pos].added_at);
 
+            console.log(`originalindex: ${originalIndex} | pos: ${pos}` );
             // if both values are equal the song is already in the correct position
             if(pos === originalIndex) return this.reorder(sortedTracks, pos+1);
 
@@ -293,13 +311,14 @@ export default {
                     this.tracks.splice(pos, 0, this.tracks.splice(originalIndex, 1)[0]);
 
                     this.playlist.snapshot_id = res.data.snapshot_id;
-                    return this.reorder(sortedTracks, pos);
+                    return this.reorder(sortedTracks, ++pos);
                 })
                 .catch(err => this.handleError(err, () => this.reorder(sortedTracks, pos)));
         },
         shuffle(){
             this.resetSort();
             this.$refs['sorted-tracks'].filteredItems.sort(() => .5 - Math.random());
+            this.sortedTracks = [...this.$refs['sorted-tracks'].filteredItems];
             this.$forceUpdate();
         },
         resetSort(){
@@ -311,12 +330,18 @@ export default {
             this.$forceUpdate();
         }
     },
+    watch: {
+        pagination: function() {
+            this.sortedTracks = null;
+            console.log(this.pagination);
+        }
+    },
     filters: {
         getBpm(track){
-            return track.features ? Math.round(track.features.tempo) : null;
+            return track.features ? Math.round(track.features.tempo) : 'N/A';
         },
         getKeyValue(track){
-            if(!track.features) return;
+            if(!track.features) return 'N/A';
             const key = track.features.key
             switch(key){
                 case 0: return `(${key}) C`
