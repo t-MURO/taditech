@@ -1,5 +1,7 @@
 # taditech
 
+Visit here https://tadi.tech
+
 Small Vue App that allows an user to see their followed artists new releases (singles/EPs and albums)
 
 Coming soon: custom reordering of playlists
