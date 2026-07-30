@@ -1,4 +1,7 @@
-# taditech
+# Tadi Tech
+
+> **This project has been replaced by [Tadi Tech 2.0](https://github.com/t-MURO/taditech2).**
+> Development continues in the new repository.
 
 Visit here https://tadi.tech
 
